@@ -15,7 +15,7 @@ VERMELHO = (255, 0, 0)
 # ROSA = (255,100,150)
 # TEAL = (100,255,255)
 LARANJA = (230,190,40)
-# VERDE = (0, 255, 0)
+VERDE = (0, 255, 0)
 
 # Movimentos
 PARAR = 0
@@ -28,12 +28,12 @@ DIREITA = -2
 ECOMAN = 0
 COLETAVEL = 1
 # POWERPELLET = 2
-# GHOST = 3
+INIMIGO = 3
 # BLINKY = 4
 # PINKY = 5
 # INKY = 6
 # CLYDE = 7
-# FRUIT = 8
+QUEST = 8
 
 # SCATTER = 0
 # CHASE = 1
