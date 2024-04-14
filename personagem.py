@@ -18,6 +18,7 @@ class Personagem(object):
         self.setPosition()
         self.target = node
         self.visible = True
+        self.image = None
 
     def setPosition(self):
         self.position = self.node.position.copy()
@@ -94,7 +95,17 @@ class Personagem(object):
             self.target = self.node.neighbors[direction]
             self.position = (self.node.position + self.target.position) / 2.0
 
+    def reset(self):
+        self.setStartNode(self.startNode)
+        self.direction = PARAR
+        self.speed = 100
+        self.visible = True
+
     def render(self, screen):
         if self.visible:
-            p = self.position.asInt()
-            pygame.draw.circle(screen, self.color, p, self.radius)
+            if self.image is not None:
+                screen.blit(self.image, self.position.asTuple())
+            else:
+                p = self.position.asInt()
+                pygame.draw.circle(screen, self.color, p, self.radius)
+            

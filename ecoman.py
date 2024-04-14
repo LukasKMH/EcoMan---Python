@@ -3,27 +3,23 @@ from pygame.locals import *
 from vetor import Vector2
 from constantes import *
 from personagem import Personagem
-
+import numpy as np
+from sprites import EcomanSprites
 
 class Ecoman(Personagem):
     def __init__(self, node):
-        Personagem.__init__(self, node )
+        Personagem.__init__(self, node)
         self.name = ECOMAN
-        #self.directions = {PARAR:Vector2(), CIMA:Vector2(0,-1), BAIXO:Vector2(0,1), ESQUERDA:Vector2(-1,0), DIREITA:Vector2(1,0)}
         self.direction = PARAR
-        #self.speed = 100 * LARGURA_BLOCO/16
         self.radius = 10
         self.collideRadius = self.radius * 0.9
         self.color = LARANJA
+        self.setSpeed(250)
         self.setBetweenNodes(ESQUERDA)
-        # self.node = node
-        # self.setPosition()
-        # self.target = node
+        self.vivo = True
+        #self.sprites = EcomanSprites(self, "assets/Imagens/submarine.png")
 
-    # def setPosition(self):
-    #     self.position = self.node.position.copy()
-
-    def update(self, dt):	
+    def update(self, dt):
         self.position += self.directions[self.direction]*self.speed*dt
         direction = self.getValidKey()
         
@@ -72,3 +68,22 @@ class Ecoman(Personagem):
             return True
         return False
     
+    def reset(self):
+        Personagem.reset(self)
+        self.direction = ESQUERDA
+        self.setBetweenNodes(ESQUERDA)
+        self.alive = True
+
+    def die(self):
+        self.alive = False
+        self.direction = PARAR
+                
+    def createEcoman(self, file):
+        data = self.lerArquivo(file)        
+        for row in range(data.shape[0]):
+            for col in range(data.shape[1]):
+                if data[row][col] in ['E',]:
+                    Ecoman(row, col)
+                    
+    def lerArquivo(self, textfile):
+        return np.loadtxt(textfile, dtype='<U1')

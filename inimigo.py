@@ -9,3 +9,7 @@ class Inimigo(Personagem):
         Personagem.__init__(self, node)
         self.name = INIMIGO
         self.points = 200
+
+    def reset(self):
+        Personagem.reset(self)
+        self.directionMethod = self.goalDirection
