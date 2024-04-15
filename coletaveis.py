@@ -1,7 +1,8 @@
 import pygame
 from vetor import Vector2
-from constantes import *
+from scripts.constantes import *
 import numpy as np
+from sprites import ColetavelSprites
 
 class Coletavel(object):
     def __init__(self, row, column):
@@ -11,9 +12,12 @@ class Coletavel(object):
         self.position = Vector2(column*LARGURA_BLOCO, row*ALTURA_BLOCO)
         self.radius = int(10 * LARGURA_BLOCO / 16)
         self.points = 800
+        self.visible = True  # Define a visibilidade inicial do coletável
+        self.radius = int(2 * LARGURA_BLOCO / 16)
+        self.collideRadius = int(2 * ALTURA_BLOCO / 16)
+        self.sprites = ColetavelSprites(self, "assets/Imagens/coletavel.png")
         # self.flashTime = 0.2
         # self.timer= 0
-        self.visible = True  # Define a visibilidade inicial do coletável
 
     # Pode ser usado para deixar os coletaveis piscando juntamente com as varaiveis flashTime e self.timer
     def update(self, dt):
@@ -25,8 +29,13 @@ class Coletavel(object):
 
     def render(self, screen):
         if self.visible:  # Verifica se o coletável é visível
-            # Desenha o coletável na tela como um círculo
-            pygame.draw.circle(screen, AMARELO, (self.column * LARGURA_BLOCO, self.row * ALTURA_BLOCO), self.radius)
+            # Desenha o sprite do coletável na tela
+            self.radius = int(2 * LARGURA_BLOCO / 16)
+            self.collideRadius = int(2 * LARGURA_BLOCO / 16)
+            position = (int(self.position.x), int(self.position.y))
+            screen.blit(self.sprites.image, position)
+
+
 
 class GrupoColetaveis(object):
     def __init__(self, pelletfile):

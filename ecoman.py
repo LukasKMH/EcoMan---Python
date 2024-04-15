@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 from vetor import Vector2
-from constantes import *
+from scripts.constantes import *
 from personagem import Personagem
 import numpy as np
 from sprites import EcomanSprites
@@ -17,7 +17,7 @@ class Ecoman(Personagem):
         self.setSpeed(250)
         self.setBetweenNodes(ESQUERDA)
         self.vivo = True
-        #self.sprites = EcomanSprites(self, "assets/Imagens/submarine.png")
+        self.sprite = EcomanSprites(self, "assets/Imagens/submarine.png")
 
     def update(self, dt):
         self.position += self.directions[self.direction]*self.speed*dt

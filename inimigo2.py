@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 from vetor import Vector2
-from constantes import *
+from scripts.constantes import *
 from personagem import Personagem
 import numpy as np
 

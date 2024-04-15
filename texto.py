@@ -1,6 +1,6 @@
 import pygame
 from vetor import Vector2
-from constantes import *
+from scripts.constantes import *
 
 class Text(object):
     def __init__(self, text, color, x, y, size, time=None, id=None, visible=True):

@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 from vetor import Vector2
-from constantes import *
+from scripts.constantes import *
 from random import randint
 
 class Personagem(object):
@@ -104,7 +104,9 @@ class Personagem(object):
     def render(self, screen):
         if self.visible:
             if self.image is not None:
-                screen.blit(self.image, self.position.asTuple())
+                adjust = Vector2(LARGURA_BLOCO, ALTURA_BLOCO) / 2
+                p = self.position - adjust
+                screen.blit(self.image, p.asTuple())
             else:
                 p = self.position.asInt()
                 pygame.draw.circle(screen, self.color, p, self.radius)

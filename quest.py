@@ -1,6 +1,6 @@
 import pygame
 from personagem import Personagem
-from constantes import *
+from scripts.constantes import *
 
 class Quest(Personagem):
     def __init__(self, node):

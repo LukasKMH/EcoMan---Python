@@ -1,6 +1,6 @@
 import pygame
 from vetor import Vector2
-from constantes import *
+from scripts.constantes import *
 import numpy as np
 
 class Node(object):

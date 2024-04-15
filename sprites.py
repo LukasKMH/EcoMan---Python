@@ -1,5 +1,5 @@
 import pygame
-from constantes import *
+from scripts.constantes import *
 import numpy as np
 
 LARGURA_BLOCO_BASE = 16
@@ -21,9 +21,10 @@ class Spritesheet(object):
         return self.sheet.subsurface(self.sheet.get_clip())
 
 class LabirintoSprites(Spritesheet):
-    def __init__(self, mazefile):
+    def __init__(self, mazefile, rotfile):
         Spritesheet.__init__(self)
         self.data = self.readMazeFile(mazefile)
+        self.rotdata = self.readMazeFile(rotfile)
 
     def getImage(self, x, y):
         return Spritesheet.getImage(self, x, y, LARGURA_BLOCO, ALTURA_BLOCO)
@@ -44,6 +45,9 @@ class LabirintoSprites(Spritesheet):
 
         return background
     
+    def rotate(self, sprite, value):
+       return pygame.transform.rotate(sprite, value*90)
+    
 class EcomanSprites(object):
     def __init__(self, entity, image_path):
         self.entity = entity
@@ -52,6 +56,13 @@ class EcomanSprites(object):
     def setImage(self, image_path):
         self.entity.image = pygame.image.load(image_path).convert_alpha()
 
+class ColetavelSprites(object):
+    def __init__(self, coletavel, image_path):
+        self.coletavel = coletavel
+        self.image = pygame.image.load(image_path).convert_alpha()
+
+    def setImage(self, image_path):
+        self.image = pygame.image.load(image_path).convert_alpha()
 
 class NumeroVidas(object):
     def __init__(self, numlives, image_path):
