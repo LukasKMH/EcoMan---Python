@@ -1,7 +1,7 @@
 import pygame
-from vetor import Vector2
-from scripts.constantes import *
 import numpy as np
+from scripts.vetor import Vector2
+from scripts.constantes import *
 
 class Node(object):
     def __init__(self, x, y):

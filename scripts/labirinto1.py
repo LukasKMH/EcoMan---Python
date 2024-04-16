@@ -2,17 +2,17 @@ import pygame
 import threading
 from pygame.locals import *
 from scripts.constantes import *
-from ecoman import Ecoman
-from nodes import NodeGroup
-from coletaveis import GrupoColetaveis
-from inimigo import Inimigo
-from quest import Quest
-from pause import Pause
-from texto import TextGroup
-from sprites import NumeroVidas, LabirintoSprites
+from scripts.ecoman import Ecoman
+from scripts.nodes import NodeGroup
+from scripts.coletaveis import GrupoColetaveis
+from scripts.inimigo import Inimigo
+from scripts.quest import Quest
+from scripts.pause import Pause
+from scripts.texto import TextGroup
+from scripts.sprites import NumeroVidas, LabirintoSprites
+#from tela_fim_fase import TelaFinal
 
-
-from inimigo2 import GrupoInimigos
+from scripts.inimigo2 import GrupoInimigos
 
 class Labirinto(object):
     def __init__(self):
@@ -56,14 +56,17 @@ class Labirinto(object):
                 inimigo.update(dt)
             if self.quest is not None:
                 self.quest.update(dt)
-            self.checkPelletEvents()
+            self.checkPelletEvents()  # Verificar se algum coletável foi consumido
             self.checkInimigoEvento()
             self.checkQuestEvento()
+            # Contar o número de coletáveis restantes após a verificação
+            self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
         afterPauseMethod = self.pause.update(dt)
         if afterPauseMethod is not None:
             afterPauseMethod()
         self.checkEvents()
         self.render()
+
 
     def gerarInimigos(self, quantidade):
         for _ in range(quantidade):
@@ -138,11 +141,15 @@ class Labirinto(object):
         coletaveis = self.ecoman.eatPellets(self.coletaveis.listaColetaveis)
         if coletaveis:
             self.coletaveis.numEaten += 1
-            self.updateScore(coletaveis.points)
+            self.atualizarPontuacao(coletaveis.points)
             self.coletaveis.listaColetaveis.remove(coletaveis)
+            # Atualizar o número de coletáveis restantes
+            self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
             if self.coletaveis.isEmpty():
+                #resultado = TelaFinal("vitoria").executar()
                 self.hideEntities()
                 self.pause.setPause(pauseTime=3, func=self.nextLevel)
+
 
     def nextLevel(self):
         self.showEntities() 
@@ -152,13 +159,13 @@ class Labirinto(object):
 
     def restartGame(self):
         self.lives = 4
-        self.level = 0
+        self.level = 1
         self.pause.paused = True
         self.fruit = None
         self.startGame()
         self.score = 0
-        self.textgroup.updateScore(self.score)
-        self.textgroup.updateLevel(self.level)
+        self.textgroup.atualizarPontuacao(self.score)
+        self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
         self.textgroup.showText(PRONTOTXT)
         self.lifesprites.resetLives(self.lives)
 
@@ -169,9 +176,9 @@ class Labirinto(object):
         self.fruit = None
         self.textgroup.showText(PRONTOTXT)
 
-    def updateScore(self, points):
+    def atualizarPontuacao(self, points):
         self.score += points
-        self.textgroup.updateScore(self.score)
+        self.textgroup.atualizarPontuacao(self.score)
 
     def render(self):
         self.screen.blit(self.background, (0, 0))
@@ -190,8 +197,8 @@ class Labirinto(object):
             self.screen.blit(self.lifesprites.images[i], (x + LARGURA_BLOCO, y - ALTURA_BLOCO))
         pygame.display.update()
 
-# if __name__ == "__main__":
-#     game = Labirinto()
-#     game.startGame()
-#     while True:
-#         game.update()
+if __name__ == "__main__":
+    game = Labirinto()
+    game.startGame()
+    while True:
+        game.update()

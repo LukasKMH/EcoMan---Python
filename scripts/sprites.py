@@ -1,6 +1,6 @@
 import pygame
-from scripts.constantes import *
 import numpy as np
+from scripts.constantes import *
 
 LARGURA_BLOCO_BASE = 16
 ALTURA_BLOCO_BASE = 16

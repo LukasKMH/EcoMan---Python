@@ -1,5 +1,5 @@
 import pygame
-from vetor import Vector2
+from scripts.vetor import Vector2
 from scripts.constantes import *
 
 class Text(object):
@@ -82,11 +82,11 @@ class TextGroup(object):
         self.alltext[PAUSETXT].visible = False
         self.alltext[GAMEOVERTXT].visible = False
 
-    def updateScore(self, score):
+    def atualizarPontuacao(self, score):
         self.updateText(PONTUACAOTXT, str(score).zfill(4))
 
-    def updateLixoRestante(self, level):
-        self.updateText(LIXO_RESTANTETXT, str(level + 1).zfill(3))
+    def atualizarLixoRestante(self, quantidade_restante):
+        self.updateText(LIXO_RESTANTETXT, str(quantidade_restante + 1).zfill(2))
 
     def updateText(self, id, value):
         if id in self.alltext.keys():

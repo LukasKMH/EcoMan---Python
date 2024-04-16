@@ -1,9 +1,9 @@
 import pygame
 from pygame.locals import *
-from vetor import Vector2
-from scripts.constantes import *
-from personagem import Personagem
 import numpy as np
+from scripts.vetor import Vector2
+from scripts.constantes import *
+from scripts.personagem import Personagem
 
 class Inimigo2(Personagem):
     def __init__(self, row, column):

@@ -1,8 +1,8 @@
 import pygame
 from pygame.locals import *
-from vetor import Vector2
-from scripts.constantes import *
 from random import randint
+from scripts.vetor import Vector2
+from scripts.constantes import *
 
 class Personagem(object):
     def __init__(self, node):

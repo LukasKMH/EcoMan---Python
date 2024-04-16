@@ -1,5 +1,5 @@
 import pygame
-from personagem import Personagem
+from scripts.personagem import Personagem
 from scripts.constantes import *
 
 class Quest(Personagem):

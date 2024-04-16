@@ -1,10 +1,10 @@
 import pygame
 from pygame.locals import *
-from vetor import Vector2
-from scripts.constantes import *
-from personagem import Personagem
 import numpy as np
-from sprites import EcomanSprites
+from scripts.vetor import Vector2
+from scripts.constantes import *
+from scripts.personagem import Personagem
+from scripts.sprites import EcomanSprites
 
 class Ecoman(Personagem):
     def __init__(self, node):

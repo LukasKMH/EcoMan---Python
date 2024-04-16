@@ -1,8 +1,8 @@
 import pygame
-from vetor import Vector2
-from scripts.constantes import *
+from scripts.vetor import Vector2
 import numpy as np
-from sprites import ColetavelSprites
+from scripts.constantes import *
+from scripts.sprites import ColetavelSprites
 
 class Coletavel(object):
     def __init__(self, row, column):

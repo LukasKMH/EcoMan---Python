@@ -2,26 +2,20 @@ import pygame
 import sys
 from pygame.locals import *
 from scripts.constantes import *
-from labirinto1 import Labirinto
+from scripts.labirinto1 import Labirinto
 
-class TelaSelecaoFases:
+
+class TelaSelecaoFases():
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
         pygame.display.set_caption("Seleção de Fases")
         self.clock = pygame.time.Clock()
-
-        # Cores
-        self.BRANCO = (255, 255, 255)
-        self.PRETO = (0, 0, 0)
-
-        # Fonte
         self.fonte = pygame.font.Font(None, 36)
-
-        # Texto e botão
-        self.texto_titulo = self.fonte.render("Seleção de Fases", True, self.BRANCO)
+        self.texto_titulo = self.fonte.render("Seleção de Fases", True, BRANCO)
         self.botao_voltar_rect = pygame.Rect(10, 10, 30, 30)
         self.botoes_fases = []
+        self.voltar_para_tela_inicial = False  # Variável de instância para controlar a mudança de tela
 
         # Posição dos elementos
         self.texto_titulo_x = LARGURA_TELA // 2
@@ -29,8 +23,6 @@ class TelaSelecaoFases:
         self.botoes_x = LARGURA_TELA // 2 - 100
         self.botoes_y = 150
         self.espaco_botoes = 60
-
-        # Número total de fases disponíveis
         self.total_fases = 5
 
         # Tamanho e posição do retângulo que engloba os botões
@@ -48,7 +40,9 @@ class TelaSelecaoFases:
         self.clock.tick(FPS)
 
         for event in pygame.event.get():
-            if event.type == MOUSEBUTTONDOWN:
+            if event.type == pygame.QUIT:
+                return "quit"
+            elif event.type == MOUSEBUTTONDOWN:
                 pos_mouse = pygame.mouse.get_pos()
                 if self.botao_voltar_rect.collidepoint(pos_mouse):
                     return "tela_inicial"
@@ -66,24 +60,33 @@ class TelaSelecaoFases:
         self.screen.fill(AZUL)
 
         # Desenhar retângulo que engloba os botões
-        pygame.draw.rect(self.screen, self.BRANCO, (self.retangulo_botoes_x, self.retangulo_botoes_y, self.retangulo_botoes_width, self.retangulo_botoes_height))
+        pygame.draw.rect(self.screen, BRANCO, (self.retangulo_botoes_x, self.retangulo_botoes_y, self.retangulo_botoes_width, self.retangulo_botoes_height))
 
         # Desenhar título
         self.screen.blit(self.texto_titulo, (self.texto_titulo_x - self.texto_titulo.get_width() // 2, self.texto_titulo_y))
 
         # Desenhar botão de voltar
-        pygame.draw.rect(self.screen, self.BRANCO, self.botao_voltar_rect)
+        pygame.draw.rect(self.screen, BRANCO, self.botao_voltar_rect)
 
         # Desenhar números para representar as fases nos botões
         for i, botao in enumerate(self.botoes_fases):
-            texto_fase = self.fonte.render(str(i + 1), True, self.PRETO)
+            texto_fase = self.fonte.render(str(i + 1), True, PRETO)
             texto_fase_rect = texto_fase.get_rect(center=botao.center)
             self.screen.blit(texto_fase, texto_fase_rect)
 
             # Desenhar borda ao redor dos botões
-            pygame.draw.rect(self.screen, self.PRETO, botao, 3)
+            pygame.draw.rect(self.screen, PRETO, botao, 3)
 
         pygame.display.flip()
+
+    # def executar(self):
+    #     while True:
+    #         retorno = self.desenhar_tela()
+    #         if retorno is not None:
+    #             if retorno == "quit":
+    #                 pygame.quit()
+    #                 sys.exit()
+    #             return retorno
 
     def executar(self):
         while True:
@@ -92,4 +95,5 @@ class TelaSelecaoFases:
                 if retorno == "quit":
                     pygame.quit()
                     sys.exit()
-                return retorno
+                elif retorno == "tela_inicial":  # Verifica se deve voltar para a tela inicial
+                    return "tela_inicial"
