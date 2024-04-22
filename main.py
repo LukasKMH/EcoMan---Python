@@ -3,6 +3,7 @@ from pygame.locals import *
 from scripts.tela_inicial import TelaInicial
 from scripts.tela_seleção_de_fases import TelaSelecaoFases
 from scripts.tela_configurações import TelaConfiguracoes
+from scripts.labirinto1 import Labirinto
 
 class ControladorTelas:
     """Classe que controla as telas do jogo. Possui uma variável que armazena a tela atual
@@ -17,12 +18,18 @@ class ControladorTelas:
             if self.tela_atual is None or self.tela_atual == "tela_inicial":
                 tela_inicial = TelaInicial()
                 self.tela_atual = tela_inicial.executar()
+
             elif self.tela_atual == "selecao_fases":
                 tela_selecao_fases = TelaSelecaoFases()
                 self.tela_atual = tela_selecao_fases.executar()
+
             elif self.tela_atual == "configuracoes":
                 tela_configuracoes = TelaConfiguracoes()
                 self.tela_atual = tela_configuracoes.executar()
+
+            elif self.tela_atual == "fase1":
+                labirinto = Labirinto()
+                self.tela_atual = labirinto.startGame()
 
 if __name__ == "__main__":
     controlador = ControladorTelas()

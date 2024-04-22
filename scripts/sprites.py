@@ -49,12 +49,32 @@ class LabirintoSprites(Spritesheet):
        return pygame.transform.rotate(sprite, value*90)
     
 class EcomanSprites(object):
-    def __init__(self, entity, image_path):
-        self.entity = entity
-        self.entity.image = pygame.image.load(image_path).convert_alpha()
+    def __init__(self, entidade, image_path):
+        self.entidade = entidade
 
-    def setImage(self, image_path):
-        self.entity.image = pygame.image.load(image_path).convert_alpha()
+        self.images = {
+            "baixo": pygame.image.load(image_path + "submarine_baixo.png").convert_alpha(),
+            "cima": pygame.image.load(image_path + "submarine_cima.png").convert_alpha(),
+            "esquerda": pygame.image.load(image_path + "submarine_esquerda.png").convert_alpha(),
+            "direita": pygame.image.load(image_path + "submarine_direita.png").convert_alpha()
+        }
+
+        self.entidade.image = self.images["esquerda"]
+
+        def update(self, dt):
+            if self.entidade.vivo == True:
+                if self.entidade.direction == ESQUERDA:
+                    self.entidade.image = self.getImage(*self.animations[ESQUERDA].update(dt))
+                    self.stopimage = (8, 0)
+                elif self.entidade.direction == DIREITA:
+                    self.entidade.image = self.getImage(*self.animations[DIREITA].update(dt))
+                    self.stopimage = (10, 0)
+                elif self.entidade.direction == BAIXO:
+                    self.entidade.image = self.getImage(*self.animations[BAIXO].update(dt))
+                    self.stopimage = (8, 2)
+                elif self.entidade.direction == CIMA:
+                    self.entidade.image = self.getImage(*self.animations[CIMA].update(dt))
+                    self.stopimage = (10, 2)
 
 class ColetavelSprites(object):
     def __init__(self, coletavel, image_path):

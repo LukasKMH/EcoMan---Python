@@ -4,36 +4,28 @@ from pygame.locals import *
 from scripts.constantes import *
 from scripts.labirinto1 import Labirinto
 
-
 class TelaSelecaoFases():
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
+        self.tela = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
         pygame.display.set_caption("Seleção de Fases")
         self.clock = pygame.time.Clock()
-        self.fonte = pygame.font.Font(None, 36)
-        self.texto_titulo = self.fonte.render("Seleção de Fases", True, BRANCO)
-        self.botao_voltar_rect = pygame.Rect(10, 10, 30, 30)
+        self.fonte = pygame.font.Font(None, 72) 
+        self.texto_titulo = self.fonte.render("Seleção de Fases", True, PRETO)
+
+        self.botao_voltar_rect = pygame.Rect(10, 10, 80, 40)
         self.botoes_fases = []
-        self.voltar_para_tela_inicial = False  # Variável de instância para controlar a mudança de tela
+        self.voltar_para_tela_inicial = False
 
         # Posição dos elementos
-        self.texto_titulo_x = LARGURA_TELA // 2
-        self.texto_titulo_y = 50
-        self.botoes_x = LARGURA_TELA // 2 - 100
-        self.botoes_y = 150
-        self.espaco_botoes = 60
-        self.total_fases = 5
+        self.largura_botao = LARGURA_BLOCO * 6
+        self.altura_botao = ALTURA_BLOCO * 6
+        self.espaco_botoes = LARGURA_BLOCO * 8.7
+        self.total_fases = 4
 
-        # Tamanho e posição do retângulo que engloba os botões
-        self.retangulo_botoes_width = 300
-        self.retangulo_botoes_height = self.total_fases * self.espaco_botoes
-        self.retangulo_botoes_x = LARGURA_TELA // 2 - self.retangulo_botoes_width // 2
-        self.retangulo_botoes_y = self.botoes_y
-
-        # Criação dos botões de seleção de fases dentro do retângulo
-        for i in range(1, self.total_fases + 1):
-            botao_rect = pygame.Rect(self.retangulo_botoes_x, self.retangulo_botoes_y + (i - 1) * self.espaco_botoes, self.retangulo_botoes_width, 40)
+        # Criação dos botões de seleção de fases
+        for i in range(self.total_fases):
+            botao_rect = pygame.Rect(0, 0, self.largura_botao, self.altura_botao)
             self.botoes_fases.append(botao_rect)
 
     def desenhar_tela(self):
@@ -46,7 +38,6 @@ class TelaSelecaoFases():
                 pos_mouse = pygame.mouse.get_pos()
                 if self.botao_voltar_rect.collidepoint(pos_mouse):
                     return "tela_inicial"
-                # Verifica se algum botão de fase foi clicado
                 for i, botao in enumerate(self.botoes_fases):
                     if botao.collidepoint(pos_mouse):
                         if i == 0:
@@ -57,36 +48,40 @@ class TelaSelecaoFases():
                         else:
                             print(f"Botão da fase {i + 1} pressionado.")  # Ação padrão para os outros botões de fase
 
-        self.screen.fill(AZUL)
-
-        # Desenhar retângulo que engloba os botões
-        pygame.draw.rect(self.screen, BRANCO, (self.retangulo_botoes_x, self.retangulo_botoes_y, self.retangulo_botoes_width, self.retangulo_botoes_height))
+        self.tela.fill(AZUL)
 
         # Desenhar título
-        self.screen.blit(self.texto_titulo, (self.texto_titulo_x - self.texto_titulo.get_width() // 2, self.texto_titulo_y))
+        self.tela.blit(self.texto_titulo, (self.texto_titulo.get_width() // 2 - 2 * LARGURA_BLOCO, ALTURA_BLOCO * 3))
 
-        # Desenhar botão de voltar
-        pygame.draw.rect(self.screen, BRANCO, self.botao_voltar_rect)
+        # Botão voltar
+        self.botao_voltar_rect = pygame.Rect(LARGURA_BLOCO * 3 - 30, ALTURA_BLOCO * 3 - 30, 60, 60)  
+        pygame.draw.rect(self.tela, AZUL, self.botao_voltar_rect, border_radius=25)
+        icone_voltar = pygame.image.load("assets/Imagens/voltar.png").convert_alpha() 
+        icone_rect = icone_voltar.get_rect(center=self.botao_voltar_rect.center)
+        self.tela.blit(icone_voltar, icone_rect)
 
-        # Desenhar números para representar as fases nos botões
+        # Desenhar retângulo azul claro para os botões de fases
+        retangulo_botoes = pygame.Rect(LARGURA_BLOCO * 5, ALTURA_BLOCO * 10, LARGURA_TELA - (LARGURA_BLOCO * 10), ALTURA_BLOCO * 15 )
+        pygame.draw.rect(self.tela, AZUL_CLARO, retangulo_botoes, border_radius=45)
+        pygame.draw.rect(self.tela, PRETO, retangulo_botoes, 2, border_radius=45)
+
+        # Ajustar a posição dos botões de acordo com o retângulo
         for i, botao in enumerate(self.botoes_fases):
-            texto_fase = self.fonte.render(str(i + 1), True, PRETO)
-            texto_fase_rect = texto_fase.get_rect(center=botao.center)
-            self.screen.blit(texto_fase, texto_fase_rect)
+            botao.x = retangulo_botoes.x + (LARGURA_BLOCO * 2) + i * self.espaco_botoes
+            botao.y = retangulo_botoes.y + ALTURA_BLOCO * 2
+            pygame.draw.rect(self.tela, BRANCO, botao, border_radius=45)
+            pygame.draw.rect(self.tela, PRETO, botao, 2, border_radius=45)
 
-            # Desenhar borda ao redor dos botões
-            pygame.draw.rect(self.screen, PRETO, botao, 3)
+            # Calcular as coordenadas para o centro do botão
+            centro_x = botao.x + botao.width // 2
+            centro_y = botao.y + botao.height // 2
+
+            # Renderizar e desenhar o número da fase no centro do botão
+            numero_fase = self.fonte.render(str(i + 1), True, AZUL)
+            texto_rect = numero_fase.get_rect(center=(centro_x, centro_y))
+            self.tela.blit(numero_fase, texto_rect)
 
         pygame.display.flip()
-
-    # def executar(self):
-    #     while True:
-    #         retorno = self.desenhar_tela()
-    #         if retorno is not None:
-    #             if retorno == "quit":
-    #                 pygame.quit()
-    #                 sys.exit()
-    #             return retorno
 
     def executar(self):
         while True:
@@ -95,5 +90,5 @@ class TelaSelecaoFases():
                 if retorno == "quit":
                     pygame.quit()
                     sys.exit()
-                elif retorno == "tela_inicial":  # Verifica se deve voltar para a tela inicial
+                elif retorno == "tela_inicial": 
                     return "tela_inicial"

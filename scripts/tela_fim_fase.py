@@ -2,7 +2,7 @@ import pygame
 import sys
 from pygame.locals import *
 from scripts.constantes import *
-from scripts.tela_seleção_de_fases import TelaSelecaoFases
+from scripts.constantes import *
 
 LARGURA_BORDA = 2
 LARGURA_BOTAO = LARGURA_BLOCO * 15
@@ -11,8 +11,9 @@ BOTAO_X = LARGURA_BLOCO * 5
 BOTAO_Y = ALTURA_BLOCO * 14
 
 class TelaFinal:
-    def __init__(self, outcome):
+    def __init__(self, outcome, tela_chamadora):
         pygame.init()
+        self.tela_chamadora = tela_chamadora
         self.tela = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
         pygame.display.set_caption("Tela de Vitória")
         self.outcome = outcome
@@ -27,26 +28,26 @@ class TelaFinal:
 
     def desenhar_tela(self):
         self.clock.tick(FPS)
-
+        
         for event in pygame.event.get():
             if event.type == QUIT:
                 return "quit"
             elif event.type == MOUSEBUTTONDOWN:
                 pos_mouse = pygame.mouse.get_pos()
-                # Verifique a colisão com os retângulos dos botões
                 if self.retangulo_mudar_fase.collidepoint(pos_mouse):
+                    from scripts.tela_seleção_de_fases import TelaSelecaoFases
                     tela = TelaSelecaoFases()
                     tela.executar()
                 elif self.retangulo_avancar.collidepoint(pos_mouse):
                     if self.outcome == "vitoria":
                         return "proxima_fase"
                     elif self.outcome == "derrota":
-                        return "recomecar_fase"
+                        self.tela_chamadora.restartGame()
 
         self.tela.fill(AZUL)
         self.tela.blit(self.imagem, self.imagem_rect)
-        self.desenhar_texto()  # Desenhe o texto de vitória ou derrota
-        self.desenhar_botoes()  # Desenhe os botões
+        self.desenhar_texto()
+        self.desenhar_botoes()
         pygame.display.update()
 
     def desenhar_texto(self):
@@ -94,8 +95,3 @@ class TelaFinal:
                     pygame.quit()
                     sys.exit()
                 return retorno
-
-# Execute o programa
-if __name__ == "__main__":
-    tela = TelaFinal("derrota")  # Troque "vitoria" por "derrota" conforme necessário
-    tela.executar()

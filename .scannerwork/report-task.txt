@@ -1,0 +1,6 @@
+projectKey=Ecoman_Python
+serverUrl=http://localhost:9000
+serverVersion=10.3.0.82913
+dashboardUrl=http://localhost:9000/dashboard?id=Ecoman_Python
+ceTaskId=AY7o8bSVbZy5kNOZ3PmA
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AY7o8bSVbZy5kNOZ3PmA

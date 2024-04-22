@@ -45,7 +45,6 @@ class TextGroup(object):
         self.nextid = 10
         self.alltext = {}
         self.setupText()
-        self.showText(PRONTOTXT)
 
     def addText(self, text, color, x, y, size, time=None, id=None):
         self.nextid += 1
@@ -58,11 +57,9 @@ class TextGroup(object):
     def setupText(self):
         size = ALTURA_BLOCO
         self.alltext[LIXO_RESTANTETXT] = Text(str(1).zfill(2), BRANCO, 6*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
-        self.alltext[TEMPOTXT] = Text(str(1).zfill(2), BRANCO, 24*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
+        self.alltext[TEMPOTXT] = Text("1:50", BRANCO, 24*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
         self.alltext[PONTUACAOTXT] = Text("0".zfill(4), BRANCO, 41*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
-        self.alltext[PRONTOTXT] = Text("PRONTO!", AMARELO, (LARGURA_TELA / 2) - LARGURA_BLOCO * 2, ALTURA_TELA / 2, size, visible=False)
         self.alltext[PAUSETXT] = Text("JOGO PAUSADO", AMARELO, LARGURA_TELA / 2, ALTURA_TELA / 2, size, visible=False)
-        self.alltext[GAMEOVERTXT] = Text("GAMEOVER!", AMARELO, LARGURA_TELA / 2, ALTURA_TELA / 2, size, visible=False)
         self.addText("LIXO:", BRANCO, 1*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
         self.addText("TEMPO:", BRANCO, 18*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
         self.addText("PONTOS:", BRANCO, 34*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
@@ -78,15 +75,26 @@ class TextGroup(object):
         self.alltext[id].visible = True
 
     def hideText(self):
-        self.alltext[PRONTOTXT].visible = False
         self.alltext[PAUSETXT].visible = False
-        self.alltext[GAMEOVERTXT].visible = False
-
-    def atualizarPontuacao(self, score):
-        self.updateText(PONTUACAOTXT, str(score).zfill(4))
 
     def atualizarLixoRestante(self, quantidade_restante):
         self.updateText(LIXO_RESTANTETXT, str(quantidade_restante + 1).zfill(2))
+
+    def atualizarTempo(self, segundos):
+        if segundos != 0:
+            if TEMPOTXT in self.alltext:
+                self.updateText(TEMPOTXT, self.formatarTempo(segundos))
+                return True
+            else:
+                return False
+
+    def formatarTempo(self, segundos):
+        minutos = segundos // 60
+        segundos %= 60
+        return "{:02}:{:02}".format(int(minutos), int(segundos))
+
+    def atualizarPontuacao(self, score):
+        self.updateText(PONTUACAOTXT, str(score).zfill(4))
 
     def updateText(self, id, value):
         if id in self.alltext.keys():

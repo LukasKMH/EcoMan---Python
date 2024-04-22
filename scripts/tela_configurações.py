@@ -1,5 +1,6 @@
 import pygame
 import sys
+from pygame import gfxdraw
 from pygame.locals import *
 from scripts.constantes import *
 
@@ -9,10 +10,12 @@ class TelaConfiguracoes:
         self.tela = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
         pygame.display.set_caption("Configurações")
         self.clock = pygame.time.Clock()
-        self.fonte = pygame.font.Font(None, 36)
+        self.fonte1 = pygame.font.Font(None, 72)
+        self.fonte2 = pygame.font.Font(None, 36)
 
-        self.texto_titulo = self.fonte.render("Configurações", True, PRETO)
-        self.texto_volume = self.fonte.render("Volume:", True, PRETO)
+
+        self.texto_titulo = self.fonte1.render("Configurações", True, PRETO)
+        self.texto_volume = self.fonte2.render("Volume:", True, PRETO)
 
         # Posição dos elementos
         self.texto_titulo_x = LARGURA_TELA // 2
@@ -43,7 +46,7 @@ class TelaConfiguracoes:
         self.tela.fill(AZUL)
 
         # Desenhar textos
-        self.tela.blit(self.texto_titulo, (self.texto_titulo_x, self.texto_titulo_y))
+        self.tela.blit(self.texto_titulo, (self.texto_titulo.get_width() // 2 + 2 * LARGURA_BLOCO, ALTURA_BLOCO * 3))
         self.tela.blit(self.texto_volume, (self.texto_volume_x, self.texto_volume_y))
 
         # Desenhar barra de volume
@@ -56,9 +59,12 @@ class TelaConfiguracoes:
         volume_bola_y = volume_bar_y + self.volume_bar_height // 2
         pygame.draw.circle(self.tela, AMARELO, (int(volume_bola_x), volume_bola_y), 8)
 
-        # Desenhar botão de voltar
-        pygame.draw.rect(self.tela, BRANCO, self.botao_voltar_rect)
-
+        # Botão voltar
+        self.botao_voltar_rect = pygame.Rect(LARGURA_BLOCO * 3 - 30, ALTURA_BLOCO * 3 - 30, 60, 60)  
+        pygame.draw.rect(self.tela, AZUL, self.botao_voltar_rect, border_radius=25)
+        icone_voltar = pygame.image.load("assets/Imagens/voltar.png").convert_alpha() 
+        icone_rect = icone_voltar.get_rect(center=self.botao_voltar_rect.center)
+        self.tela.blit(icone_voltar, icone_rect)
         pygame.display.flip()
 
     def executar(self):

@@ -17,7 +17,8 @@ class Ecoman(Personagem):
         self.setSpeed(250)
         self.setBetweenNodes(ESQUERDA)
         self.vivo = True
-        self.sprite = EcomanSprites(self, "assets/Imagens/submarine.png")
+        #self.sprite = EcomanSprites(self, "assets/Imagens/submarine_esquerda.png")
+        self.sprite = EcomanSprites(self, "assets/Imagens/")
 
     def update(self, dt):
         self.position += self.directions[self.direction]*self.speed*dt

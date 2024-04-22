@@ -10,7 +10,7 @@ from scripts.quest import Quest
 from scripts.pause import Pause
 from scripts.texto import TextGroup
 from scripts.sprites import NumeroVidas, LabirintoSprites
-#from tela_fim_fase import TelaFinal
+from scripts.tela_fim_fase import TelaFinal
 
 from scripts.inimigo2 import GrupoInimigos
 
@@ -25,9 +25,10 @@ class Labirinto(object):
         self.level = 1
         self.vidas = 4
         self.score = 0
+        self.segundos = 120
+        self.segundos_aux = 0
         self.textgroup = TextGroup()
         self.lifesprites = NumeroVidas(self.vidas, "assets/Imagens/vida.png")
-
 
     def setBackground(self):
         self.background = pygame.surface.Surface(TAMANHO_TELA).convert()
@@ -41,13 +42,16 @@ class Labirinto(object):
         self.ecoman = Ecoman(self.nodes.getStartTempNode())
         self.coletaveis = GrupoColetaveis("fase2.txt")
         self.lista_inimigos = []
+        self.textgroup.atualizarPontuacao(self.score)
+        self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
+        self.lifesprites.resetLives(self.vidas)
+        self.atualizarTempo()
         while True:
             self.update()
 
-        #self.gerarInimigos(3)
-
     def update(self):
         dt = self.clock.tick(60) / 1000.0
+        self.segundos_aux += 1
         self.textgroup.update(dt)
         self.coletaveis.update(dt)
         if not self.pause.paused:
@@ -61,13 +65,21 @@ class Labirinto(object):
             self.checkQuestEvento()
             # Contar o número de coletáveis restantes após a verificação
             self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
+            if self.segundos_aux >= 60:
+                self.segundos_aux = 0
+                self.segundos -= 1
+                self.atualizarTempo()
+
         afterPauseMethod = self.pause.update(dt)
         if afterPauseMethod is not None:
             afterPauseMethod()
         self.checkEvents()
         self.render()
 
-
+    def atualizarTempo(self):
+        if not self.textgroup.atualizarTempo(self.segundos):
+            resultado = TelaFinal("derrota", self).executar()
+        
     def gerarInimigos(self, quantidade):
         for _ in range(quantidade):
             novo_inimigo = Inimigo(self.nodes.getStartTempNode())  # Crie um novo inimigo
@@ -146,35 +158,30 @@ class Labirinto(object):
             # Atualizar o número de coletáveis restantes
             self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
             if self.coletaveis.isEmpty():
-                #resultado = TelaFinal("vitoria").executar()
-                self.hideEntities()
-                self.pause.setPause(pauseTime=3, func=self.nextLevel)
-
+                # Se todos os coletáveis foram coletados, exiba a tela de vitória e inicie o próximo nível
+                self.hideEntities()  # Esconda entidades durante a transição
+                self.nextLevel()  # Inicie o próximo nível e exiba a tela de vitória
 
     def nextLevel(self):
         self.showEntities() 
         self.level += 1
         self.pause.paused = True
-        self.startGame()
+        resultado = TelaFinal("vitoria", self).executar()
 
     def restartGame(self):
-        self.lives = 4
+        self.vidas = 4
         self.level = 1
-        self.pause.paused = True
+        self.segundos = 3
+        self.segundos_aux = 0
         self.fruit = None
-        self.startGame()
         self.score = 0
-        self.textgroup.atualizarPontuacao(self.score)
-        self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
-        self.textgroup.showText(PRONTOTXT)
-        self.lifesprites.resetLives(self.lives)
+        self.startGame()
 
-    def resetLevel(self):
-        self.pause.paused = True
-        self.pacman.reset()
-        self.ghosts.reset()
-        self.fruit = None
-        self.textgroup.showText(PRONTOTXT)
+    # def resetLevel(self):
+    #     self.pause.paused = True
+    #     self.pacman.reset()
+    #     self.ghosts.reset()
+    #     self.fruit = None
 
     def atualizarPontuacao(self, points):
         self.score += points
