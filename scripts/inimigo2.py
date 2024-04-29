@@ -5,49 +5,41 @@ from scripts.vetor import Vector2
 from scripts.constantes import *
 from scripts.personagem import Personagem
 
-class Inimigo2(Personagem):
+class Inimigo(Personagem):
     def __init__(self, row, column):
         self.name = INIMIGO
-        self.row = row  # Armazena a posição da linha
-        self.column = column  # Armazena a posição da coluna
-        self.position = Vector2(column*LARGURA_BLOCO, row*ALTURA_BLOCO)
-        self.radius = int(10 * LARGURA_BLOCO / 16)
-        self.points = 800
-        self.visible = True  # Define a visibilidade inicial do coletável
+        self.points = 0  # Pontos associados ao inimigo
 
     def reset(self):
-        Personagem.reset(self)
-        self.directionMethod = self.goalDirection
+        super().reset()
+        # Adicione aqui qualquer reinicialização específica do inimigo
 
     def render(self, screen):
-        if self.visible:  # Verifica se o coletável é visível
-            # Desenha o coletável na tela como um círculo
-            pygame.draw.circle(screen, AMARELO, (self.column * LARGURA_BLOCO, self.row * ALTURA_BLOCO), self.radius)
+        # Desenha o inimigo na tela como um círculo vermelho
+        pygame.draw.circle(screen, VERMELHO, (int(self.position.x), int(self.position.y)), self.radius)
 
 class GrupoInimigos(object):
-    def __init__(self, pelletfile):
+    def __init__(self, inimigosfile):
         self.listaInimigos = []
-        self.createPelletList(pelletfile)
+        self.createInimigosList(inimigosfile)
 
     def update(self, dt):
-        for coletavel in self.listaInimigos:
-            coletavel.update(dt)
+        for inimigo in self.listaInimigos:
+            inimigo.update(dt)
                 
-    def createPelletList(self, pelletfile):
-        data = self.readPelletfile(pelletfile)        
+    def createInimigosList(self, inimigosfile):
+        data = self.readInimigosfile(inimigosfile)        
         for row in range(data.shape[0]):
             for col in range(data.shape[1]):
                 if data[row][col] in ['I']:
-                    self.listaInimigos.append(Inimigo2(row, col))
+                    self.listaInimigos.append(Inimigo(row, col))
                     
-    def readPelletfile(self, textfile):
+    def readInimigosfile(self, textfile):
         return np.loadtxt(textfile, dtype='<U1')
     
     def isEmpty(self):
-        if len(self.listaInimigos) == 0:
-            return True
-        return False
+        return len(self.listaInimigos) == 0
     
     def render(self, screen):
-        for coletavel in self.listaInimigos:
-            coletavel.render(screen)
+        for inimigo in self.listaInimigos:
+            inimigo.render(screen)

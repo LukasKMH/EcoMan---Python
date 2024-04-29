@@ -1,3 +1,4 @@
+import os
 import pygame
 import numpy as np
 from scripts.constantes import *
@@ -7,7 +8,7 @@ ALTURA_BLOCO_BASE = 16
 
 class Spritesheet(object):
     def __init__(self):
-        self.sheet = pygame.image.load("assets/Imagens/spritesheet.png").convert()
+        self.sheet = pygame.image.load("assets/Imagens/labirinto.png").convert()
         transcolor = self.sheet.get_at((0,0))
         self.sheet.set_colorkey(transcolor)
         width = int(self.sheet.get_width() / LARGURA_BLOCO_BASE * LARGURA_BLOCO)
@@ -33,25 +34,39 @@ class LabirintoSprites(Spritesheet):
         return np.loadtxt(mazefile, dtype='<U1')
 
     def constructBackground(self, background, y):
-        for row in list(range(self.data.shape[0])):
-            for col in list(range(self.data.shape[1])):
-                if self.data[row][col].isdigit():
-                    x = int(self.data[row][col]) + 12
-                    sprite = self.getImage(x, y)
-                    background.blit(sprite, (col*LARGURA_BLOCO, row*ALTURA_BLOCO))
-                elif self.data[row][col] == '=':
-                    sprite = self.getImage(10, 8)
-                    background.blit(sprite, (col*LARGURA_BLOCO, row*ALTURA_BLOCO))
+        for row in range(self.data.shape[0]):
+            for col in range(self.data.shape[1]):
+                if self.data[row][col] == '0':
+                    # Quinas
+                    filepath = os.path.join("assets/Imagens/labirinto", "20_labirinto.png")
+                elif self.data[row][col] == '1':
+                    # Bordas
+                    filepath = os.path.join("assets/Imagens/labirinto", "26_labirinto.png")
+                elif self.data[row][col] == '2':
+                    # Quinas Dentro
+                    filepath = os.path.join("assets/Imagens/labirinto", "26_labirinto.png")
+                elif self.data[row][col] == '3':
+                    # Bordas Dentro
+                    filepath = os.path.join("assets/Imagens/labirinto", "19_labirinto.png")
+                elif self.data[row][col] == '4':
+                    # Preenchido
+                    filepath = os.path.join("assets/Imagens/labirinto", "19_labirinto.png")
+                else:
+                    continue  
+                sprite = pygame.image.load(filepath).convert_alpha()  # Carrega a imagem com transparência
+                sprite = pygame.transform.scale(sprite, (LARGURA_BLOCO, ALTURA_BLOCO))  # Redimensiona a imagem
+                rotval = int(self.rotdata[row][col])
+                sprite = self.rotate(sprite, rotval)
+                background.blit(sprite, (col*LARGURA_BLOCO, row*ALTURA_BLOCO))
 
         return background
-    
+
     def rotate(self, sprite, value):
-       return pygame.transform.rotate(sprite, value*90)
-    
+        return pygame.transform.rotate(sprite, value*90)
+
 class EcomanSprites(object):
     def __init__(self, entidade, image_path):
         self.entidade = entidade
-
         self.images = {
             "baixo": pygame.image.load(image_path + "submarine_baixo.png").convert_alpha(),
             "cima": pygame.image.load(image_path + "submarine_cima.png").convert_alpha(),
@@ -61,28 +76,45 @@ class EcomanSprites(object):
 
         self.entidade.image = self.images["esquerda"]
 
-        def update(self, dt):
-            if self.entidade.vivo == True:
-                if self.entidade.direction == ESQUERDA:
-                    self.entidade.image = self.getImage(*self.animations[ESQUERDA].update(dt))
-                    self.stopimage = (8, 0)
-                elif self.entidade.direction == DIREITA:
-                    self.entidade.image = self.getImage(*self.animations[DIREITA].update(dt))
-                    self.stopimage = (10, 0)
-                elif self.entidade.direction == BAIXO:
-                    self.entidade.image = self.getImage(*self.animations[BAIXO].update(dt))
-                    self.stopimage = (8, 2)
-                elif self.entidade.direction == CIMA:
-                    self.entidade.image = self.getImage(*self.animations[CIMA].update(dt))
-                    self.stopimage = (10, 2)
+    def update(self):
+        if self.entidade.vivo:
+            if self.entidade.direction == CIMA:
+                self.entidade.image = self.images["cima"]
+            elif self.entidade.direction == BAIXO:
+                self.entidade.image = self.images["baixo"]
+            elif self.entidade.direction == ESQUERDA:
+                self.entidade.image = self.images["esquerda"]
+            elif self.entidade.direction == DIREITA:
+                self.entidade.image = self.images["direita"]
 
 class ColetavelSprites(object):
     def __init__(self, coletavel, image_path):
         self.coletavel = coletavel
         self.image = pygame.image.load(image_path).convert_alpha()
 
-    def setImage(self, image_path):
-        self.image = pygame.image.load(image_path).convert_alpha()
+    # def setImage(self, image_path):
+    #     self.image = pygame.image.load(image_path).convert_alpha()
+
+class InimigoSprites(object):
+    def __init__(self, entidade, image_path):
+        self.entidade = entidade
+        self.images = {
+            "baixo": pygame.transform.scale(pygame.image.load(image_path + "tubarao_baixo.png").convert_alpha(), (LARGURA_BLOCO * 2, ALTURA_BLOCO * 2)),
+            "cima": pygame.transform.scale(pygame.image.load(image_path + "tubarao_cima.png").convert_alpha(), (LARGURA_BLOCO * 2, ALTURA_BLOCO * 2)),
+            "esquerda": pygame.transform.scale(pygame.image.load(image_path + "tubarao_esquerda.png").convert_alpha(), (LARGURA_BLOCO * 2, ALTURA_BLOCO * 2)),
+            "direita": pygame.transform.scale(pygame.image.load(image_path + "tubarao_direita.png").convert_alpha(), (LARGURA_BLOCO * 2, ALTURA_BLOCO * 2))
+        }
+        self.entidade.image = self.images["direita"]
+
+    def update(self):
+        if self.entidade.direction == CIMA:
+            self.entidade.image = self.images["cima"]
+        elif self.entidade.direction == BAIXO:
+            self.entidade.image = self.images["baixo"]
+        elif self.entidade.direction == ESQUERDA:
+            self.entidade.image = self.images["esquerda"]
+        elif self.entidade.direction == DIREITA:
+            self.entidade.image = self.images["direita"]
 
 class NumeroVidas(object):
     def __init__(self, numlives, image_path):

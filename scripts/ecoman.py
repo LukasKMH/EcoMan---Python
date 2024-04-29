@@ -11,18 +11,18 @@ class Ecoman(Personagem):
         Personagem.__init__(self, node)
         self.name = ECOMAN
         self.direction = PARAR
+        #self.position = self.definirInicio(pelletfile)
         self.radius = 10
         self.collideRadius = self.radius * 0.9
         self.color = LARANJA
         self.setSpeed(250)
-        self.setBetweenNodes(ESQUERDA)
         self.vivo = True
-        #self.sprite = EcomanSprites(self, "assets/Imagens/submarine_esquerda.png")
-        self.sprite = EcomanSprites(self, "assets/Imagens/")
-
+        self.sprite = EcomanSprites(self, "assets/Imagens/ecoman/")
+        
     def update(self, dt):
         self.position += self.directions[self.direction]*self.speed*dt
         direction = self.getValidKey()
+        self.sprite.update()
         
         if self.overshotTarget():
             self.node = self.target
@@ -78,13 +78,3 @@ class Ecoman(Personagem):
     def die(self):
         self.alive = False
         self.direction = PARAR
-                
-    def createEcoman(self, file):
-        data = self.lerArquivo(file)        
-        for row in range(data.shape[0]):
-            for col in range(data.shape[1]):
-                if data[row][col] in ['E',]:
-                    Ecoman(row, col)
-                    
-    def lerArquivo(self, textfile):
-        return np.loadtxt(textfile, dtype='<U1')

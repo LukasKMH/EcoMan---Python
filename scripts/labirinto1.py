@@ -25,9 +25,12 @@ class Labirinto(object):
         self.level = 1
         self.vidas = 4
         self.score = 0
-        self.segundos = 120
+        self.segundos = 90
         self.segundos_aux = 0
         self.textgroup = TextGroup()
+        self.nodes = NodeGroup("fase1.txt") 
+        self.lista_inimigos = []
+        self.gerarInimigos(1)
         self.lifesprites = NumeroVidas(self.vidas, "assets/Imagens/vida.png")
 
     def setBackground(self):
@@ -36,12 +39,10 @@ class Labirinto(object):
 
     def startGame(self):
         self.setBackground()
-        self.mazesprites = LabirintoSprites("fase2.txt", "maze1_rotation.txt")
+        self.mazesprites = LabirintoSprites("fase1.txt", "fase1_rotacao.txt")
         self.background = self.mazesprites.constructBackground(self.background, self.level%5)
-        self.nodes = NodeGroup("fase2.txt") 
         self.ecoman = Ecoman(self.nodes.getStartTempNode())
-        self.coletaveis = GrupoColetaveis("fase2.txt")
-        self.lista_inimigos = []
+        self.coletaveis = GrupoColetaveis("fase1.txt")
         self.textgroup.atualizarPontuacao(self.score)
         self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
         self.lifesprites.resetLives(self.vidas)
@@ -60,8 +61,9 @@ class Labirinto(object):
                 inimigo.update(dt)
             if self.quest is not None:
                 self.quest.update(dt)
-            self.checkPelletEvents()  # Verificar se algum coletável foi consumido
-            self.checkInimigoEvento()
+            self.check()
+            if self.ecoman.collideRadius != 0:
+                self.checkInimigoEvento()
             self.checkQuestEvento()
             # Contar o número de coletáveis restantes após a verificação
             self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
@@ -82,34 +84,28 @@ class Labirinto(object):
         
     def gerarInimigos(self, quantidade):
         for _ in range(quantidade):
-            novo_inimigo = Inimigo(self.nodes.getStartTempNode())  # Crie um novo inimigo
-            self.lista_inimigos.append(novo_inimigo)  # Adicione o inimigo à lista
+            novo_inimigo = Inimigo(self.nodes.startInimigos())
+            self.lista_inimigos.append(novo_inimigo)
 
     def checkInimigoEvento(self):
         for inimigo in self.lista_inimigos:
             if self.ecoman.colideInimigo(inimigo):
-
-                # self.ecoman.visible = False
-                # inimigo.visible = False
-                # self.pause.setPause(pauseTime=1, func=self.showEntities)
-        
-                if self.pacman.alive:
-                    self.lives -=  1
+                if self.ecoman.vivo:
+                    self.vidas -=  1
                     self.lifesprites.removeImage()
-                    self.pacman.die()
-                    self.ghosts.hide()
-                    if self.lives <= 0:
-                        self.textgroup.showText(GAMEOVERTXT)
-                        self.pause.setPause(pauseTime=3, func=self.restartGame)
+                    raio = self.ecoman.collideRadius
+                    self.ecoman.collideRadius = 0
+                    if self.vidas == 0:
+                        resultado = TelaFinal("derrota", self).executar()
                     else:
-                        self.pause.setPause(pauseTime=3, func=self.resetLevel)
+                        self.pause.setPause(pauseTime=0.5)  
+                inimigo.setSpeed(70)
+                threading.Timer(2, self.restaurarVelocidade, args=[inimigo, raio]).start()
 
+    def restaurarVelocidade(self, inimigo, raio):
+        inimigo.setSpeed(150)
+        self.ecoman.collideRadius = raio
 
-                # inimigo.setSpeed(500)
-                # # Inicia um temporizador para restaurar a velocidade após 2 segundos
-                # threading.Timer(2, self.restaurarVelocidade, args=[inimigo]).start()
-
-    # Deixar inimigos e o ecoman visiveis ou nao
     def showEntities(self):
         self.ecoman.visible = True
         for inimigo in self.lista_inimigos:
@@ -120,10 +116,6 @@ class Labirinto(object):
         for inimigo in self.lista_inimigos:
             inimigo.visble = False
     
-    def restaurarVelocidade(self, inimigo):
-        # Retorna a velocidade do inimigo ao normal
-        inimigo.setSpeed(100)
-
     def checkQuestEvento(self):
         if self.coletaveis.numEaten == 1:
             if self.quest is None:
@@ -149,7 +141,7 @@ class Labirinto(object):
                         self.textgroup.showText(PAUSETXT)
                     #     self.hideEntities()
 
-    def checkPelletEvents(self):
+    def check(self):
         coletaveis = self.ecoman.eatPellets(self.coletaveis.listaColetaveis)
         if coletaveis:
             self.coletaveis.numEaten += 1
@@ -171,17 +163,10 @@ class Labirinto(object):
     def restartGame(self):
         self.vidas = 4
         self.level = 1
-        self.segundos = 3
+        self.segundos = 90
         self.segundos_aux = 0
-        self.fruit = None
         self.score = 0
         self.startGame()
-
-    # def resetLevel(self):
-    #     self.pause.paused = True
-    #     self.pacman.reset()
-    #     self.ghosts.reset()
-    #     self.fruit = None
 
     def atualizarPontuacao(self, points):
         self.score += points
@@ -196,7 +181,6 @@ class Labirinto(object):
         self.ecoman.render(self.screen)
         for inimigo in self.lista_inimigos:
             inimigo.render(self.screen)
-        #self.lista_inimigos.render(self.screen)
         self.textgroup.render(self.screen)
         for i in range(len(self.lifesprites.images)):
             x = self.lifesprites.images[i].get_width() * i

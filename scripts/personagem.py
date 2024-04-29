@@ -58,7 +58,6 @@ class Personagem(object):
     def setSpeed(self, speed):
         self.speed = speed * LARGURA_BLOCO / 16
 
-    # Caso queira que os inimigos se moval de outra maneira, alterar a logica
     def update(self, dt):
         self.position += self.directions[self.direction]*self.speed*dt
          
@@ -66,9 +65,6 @@ class Personagem(object):
             self.node = self.target
             directions = self.validDirections()
             direction = self.randomDirection(directions)   
-            # if not self.disablePortal:
-            #     if self.node.neighbors[PORTAL] is not None:
-            #         self.node = self.node.neighbors[PORTAL]
             self.target = self.getNewTarget(direction)
             if self.target is not self.node:
                 self.direction = direction

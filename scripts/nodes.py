@@ -90,7 +90,11 @@ class NodeGroup(object):
     # Nó inicial
     def getStartTempNode(self):
         nodes = list(self.nodesLUT.values())
-        return nodes[0]
+        return nodes[3]
+    
+    def startInimigos(self):
+        nodes = list(self.nodesLUT.values())
+        return nodes[22]
 
     def render(self, screen):
         for node in self.nodesLUT.values():
