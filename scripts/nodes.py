@@ -21,7 +21,7 @@ class NodeGroup(object):
     def __init__(self, level):
         self.level = level
         self.nodesLUT = {}
-        self.nodeSymbols = ['+', 'n']
+        self.nodeSymbols = ['+', 'n', 'p', 'P']
         self.pathSymbols = ['.', '-', '|', 'p', 'P', 'E', 'I']
         data = self.readMazeFile(level)
         self.createNodeTable(data)

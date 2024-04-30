@@ -11,7 +11,6 @@ class Ecoman(Personagem):
         Personagem.__init__(self, node)
         self.name = ECOMAN
         self.direction = PARAR
-        #self.position = self.definirInicio(pelletfile)
         self.radius = 10
         self.collideRadius = self.radius * 0.9
         self.color = LARANJA
@@ -52,7 +51,7 @@ class Ecoman(Personagem):
             return DIREITA
         return PARAR
 
-    def eatPellets(self, listaColetaveis):
+    def coletar(self, listaColetaveis):
         for coletavel in listaColetaveis:
             if self.collideCheck(coletavel):
                 return coletavel
@@ -68,6 +67,7 @@ class Ecoman(Personagem):
         if dSquared <= rSquared:
             return True
         return False
+
     
     def reset(self):
         Personagem.reset(self)

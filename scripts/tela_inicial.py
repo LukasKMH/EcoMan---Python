@@ -21,8 +21,12 @@ class TelaInicial:
         self.altura_botao = ALTURA_TELA // 9
         self.botao_x = LARGURA_TELA // 3
         self.botao_y = ALTURA_TELA // 3
-
         self.clock = pygame.time.Clock()
+
+        self.volume = 50
+        pygame.mixer.music.set_volume(self.volume / 100)
+        self.musica_de_fundo = pygame.mixer.music.load("assets/sons/musica_fundo.wav")
+        pygame.mixer.music.play()
 
     def desenhar_botoes(self):
         retangulo_jogar = pygame.Rect(self.botao_x, self.botao_y, self.largura_botao, self.altura_botao)

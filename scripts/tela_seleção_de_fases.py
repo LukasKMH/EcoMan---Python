@@ -3,6 +3,9 @@ import sys
 from pygame.locals import *
 from scripts.constantes import *
 from scripts.labirinto1 import Labirinto
+from scripts.labirinto2 import Labirinto2
+from scripts.labirinto3 import Labirinto3
+from scripts.labirinto4 import Labirinto4
 
 class TelaSelecaoFases():
     def __init__(self):
@@ -40,13 +43,19 @@ class TelaSelecaoFases():
                     return "tela_inicial"
                 for i, botao in enumerate(self.botoes_fases):
                     if botao.collidepoint(pos_mouse):
+                        pygame.mixer.music.stop()
                         if i == 0:
                             labirinto = Labirinto()  
                             labirinto.startGame()
+                        elif i == 1:
+                            labirinto = Labirinto2()  
+                            labirinto.startGame()
                         elif i == 2:
-                            print("Ação específica para o botão 3")
-                        else:
-                            print(f"Botão da fase {i + 1} pressionado.")  # Ação padrão para os outros botões de fase
+                            labirinto = Labirinto3()  
+                            labirinto.startGame()
+                        elif i == 3:
+                            labirinto = Labirinto4()  
+                            labirinto.startGame()
 
         self.tela.fill(AZUL)
 

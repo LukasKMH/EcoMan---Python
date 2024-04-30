@@ -1,3 +1,9 @@
+import pygame
+import sys
+from pygame.locals import *
+
+pygame.init()
+
 # Tela
 LARGURA_BLOCO = 16
 ALTURA_BLOCO = 16
@@ -30,18 +36,8 @@ DIREITA = -2
 
 ECOMAN = 0
 COLETAVEL = 1
-# POWERPELLET = 2
 INIMIGO = 3
-# BLINKY = 4
-# PINKY = 5
-# INKY = 6
-# CLYDE = 7
 QUEST = 8
-
-# SCATTER = 0
-# CHASE = 1
-# FREIGHT = 2
-# SPAWN = 3
 
 LIXO_RESTANTETXT = 1
 PONTUACAOTXT = 2
@@ -50,3 +46,8 @@ PRONTOTXT = 4
 PAUSETXT = 5
 VITORIATXT = 6
 GAMEOVERTXT = 7
+
+# Sons
+SOM_COLISAO = pygame.mixer.Sound("assets/sons/coletar.wav")
+
+acertou = False

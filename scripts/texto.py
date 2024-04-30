@@ -59,7 +59,7 @@ class TextGroup(object):
         self.alltext[LIXO_RESTANTETXT] = Text(str(1).zfill(2), BRANCO, 6*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
         self.alltext[TEMPOTXT] = Text("1:50", BRANCO, 24*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
         self.alltext[PONTUACAOTXT] = Text("0".zfill(4), BRANCO, 41*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
-        self.alltext[PAUSETXT] = Text("JOGO PAUSADO", AMARELO, LARGURA_TELA / 2, ALTURA_TELA / 2, size, visible=False)
+        self.alltext[PAUSETXT] = Text("JOGO PAUSADO", AMARELO, LARGURA_TELA // 2 - LARGURA_BLOCO * 6, ALTURA_TELA / 2, size, visible=False)
         self.addText("LIXO:", BRANCO, 1*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
         self.addText("TEMPO:", BRANCO, 18*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
         self.addText("PONTOS:", BRANCO, 34*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)

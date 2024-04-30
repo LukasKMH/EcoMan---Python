@@ -11,6 +11,7 @@ from scripts.pause import Pause
 from scripts.texto import TextGroup
 from scripts.sprites import NumeroVidas, LabirintoSprites
 from scripts.tela_fim_fase import TelaFinal
+from scripts.tela_pergunta import QuizApp
 
 from scripts.inimigo2 import GrupoInimigos
 
@@ -20,17 +21,16 @@ class Labirinto(object):
         self.screen = pygame.display.set_mode(TAMANHO_TELA, 0, 32)
         self.background = None
         self.clock = pygame.time.Clock()
-        self.quest = None
         self.pause = Pause(False)
         self.level = 1
         self.vidas = 4
         self.score = 0
-        self.segundos = 90
+        self.segundos = 100
         self.segundos_aux = 0
         self.textgroup = TextGroup()
-        self.nodes = NodeGroup("fase1.txt") 
+        self.nodes = NodeGroup("assets/mapas/fase1.txt") 
         self.lista_inimigos = []
-        self.gerarInimigos(1)
+        self.gerarInimigos(2)
         self.lifesprites = NumeroVidas(self.vidas, "assets/Imagens/vida.png")
 
     def setBackground(self):
@@ -39,10 +39,11 @@ class Labirinto(object):
 
     def startGame(self):
         self.setBackground()
-        self.mazesprites = LabirintoSprites("fase1.txt", "fase1_rotacao.txt")
+        self.quest = Quest(self.nodes.getStartTempNode())
+        self.mazesprites = LabirintoSprites("assets/mapas/fase1.txt", "assets/mapas/fase1_rotacao.txt")
         self.background = self.mazesprites.constructBackground(self.background, self.level%5)
         self.ecoman = Ecoman(self.nodes.getStartTempNode())
-        self.coletaveis = GrupoColetaveis("fase1.txt")
+        self.coletaveis = GrupoColetaveis("assets/mapas/fase1.txt")
         self.textgroup.atualizarPontuacao(self.score)
         self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
         self.lifesprites.resetLives(self.vidas)
@@ -61,11 +62,10 @@ class Labirinto(object):
                 inimigo.update(dt)
             if self.quest is not None:
                 self.quest.update(dt)
-            self.check()
+            self.checkColetaveisEvento()
             if self.ecoman.collideRadius != 0:
                 self.checkInimigoEvento()
             self.checkQuestEvento()
-            # Contar o número de coletáveis restantes após a verificação
             self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
             if self.segundos_aux >= 60:
                 self.segundos_aux = 0
@@ -117,15 +117,16 @@ class Labirinto(object):
             inimigo.visble = False
     
     def checkQuestEvento(self):
-        if self.coletaveis.numEaten == 1:
-            if self.quest is None:
-                self.quest = Quest(self.nodes.getStartTempNode())
-        if self.quest is not None:
-            if self.ecoman.collideCheck(self.quest):
-                self.quest = None
-            elif self.quest.destroy:
-                self.quest = None
-                
+        if self.quest is not None and self.ecoman.collideCheck(self.quest):
+            self.quest = None  # Faz o quest sumir da tela
+            nova_tela = QuizApp()  # Cria uma nova instância da tela desejada com a janela principal
+            acertou = nova_tela.iniciar()  # Armazena o resultado retornado pelo método iniciar
+            if acertou:
+                print("acertou")
+                self.atualizarPontuacao(1000)
+            else:
+                print("errou")
+            
     def checkEvents(self):
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -136,23 +137,19 @@ class Labirinto(object):
                         self.pause.setPause(playerPaused=True)
                     if not self.pause.paused:
                         self.textgroup.hideText()
-                    #     self.showEntities()
                     else:
                         self.textgroup.showText(PAUSETXT)
-                    #     self.hideEntities()
 
-    def check(self):
-        coletaveis = self.ecoman.eatPellets(self.coletaveis.listaColetaveis)
+    def checkColetaveisEvento(self):
+        coletaveis = self.ecoman.coletar(self.coletaveis.listaColetaveis)
         if coletaveis:
+            SOM_COLISAO.play()
             self.coletaveis.numEaten += 1
             self.atualizarPontuacao(coletaveis.points)
             self.coletaveis.listaColetaveis.remove(coletaveis)
-            # Atualizar o número de coletáveis restantes
             self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
             if self.coletaveis.isEmpty():
-                # Se todos os coletáveis foram coletados, exiba a tela de vitória e inicie o próximo nível
-                self.hideEntities()  # Esconda entidades durante a transição
-                self.nextLevel()  # Inicie o próximo nível e exiba a tela de vitória
+                resultado = TelaFinal("vitoria", self).executar()
 
     def nextLevel(self):
         self.showEntities() 
@@ -174,7 +171,7 @@ class Labirinto(object):
 
     def render(self):
         self.screen.blit(self.background, (0, 0))
-        self.nodes.render(self.screen)
+        #self.nodes.render(self.screen)
         self.coletaveis.render(self.screen)
         if self.quest is not None:
             self.quest.render(self.screen)

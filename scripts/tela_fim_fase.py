@@ -17,14 +17,14 @@ class TelaFinal:
         self.tela = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
         pygame.display.set_caption("Tela de Vitória")
         self.outcome = outcome
-        self.imagem = pygame.image.load("./assets/Imagens/feliz.png") if self.outcome == "vitoria" else pygame.image.load("./assets/Imagens/triste.png")
+        self.imagem = pygame.image.load("./assets/Imagens/feliz.png") if self.outcome == "vitoria" or self.outcome == "fim" else pygame.image.load("./assets/Imagens/triste.png")
         self.imagem_rect = self.imagem.get_rect()
         self.imagem_rect.center = (LARGURA_TELA // 2 + 200, ALTURA_TELA // 2)
         self.clock = pygame.time.Clock()
         
         # Defina os retângulos dos botões como atributos da classe
         self.retangulo_avancar = pygame.Rect(BOTAO_X, BOTAO_Y, LARGURA_BOTAO, ALTURA_BOTAO)
-        self.retangulo_mudar_fase = pygame.Rect(BOTAO_X, BOTAO_Y + (6 * ALTURA_BLOCO), LARGURA_BOTAO, ALTURA_BOTAO)
+        self.retangulo_mudar_fase = pygame.Rect(BOTAO_X, BOTAO_Y, LARGURA_BOTAO, ALTURA_BOTAO)
 
     def desenhar_tela(self):
         self.clock.tick(FPS)
@@ -36,14 +36,26 @@ class TelaFinal:
                 pos_mouse = pygame.mouse.get_pos()
                 if self.retangulo_mudar_fase.collidepoint(pos_mouse):
                     from scripts.tela_seleção_de_fases import TelaSelecaoFases
-                    tela = TelaSelecaoFases()
+                    from scripts.tela_inicial import TelaInicial
+                    tela = TelaInicial()
                     tela.executar()
                 elif self.retangulo_avancar.collidepoint(pos_mouse):
                     if self.outcome == "vitoria":
-                        return "proxima_fase"
+                        if self.tela_chamadora.level == 1: 
+                            from scripts.labirinto2 import Labirinto2
+                            labirinto = Labirinto2()  
+                            labirinto.startGame()
+                        elif self.tela_chamadora.level == 2:
+                            from scripts.labirinto3 import Labirinto3
+                            labirinto = Labirinto3()  
+                            labirinto.startGame()
+                        elif self.tela_chamadora.level == 3:
+                            from scripts.labirinto4 import Labirinto4
+                            labirinto = Labirinto4()  
+                            labirinto.startGame()
                     elif self.outcome == "derrota":
                         self.tela_chamadora.restartGame()
-
+                        
         self.tela.fill(AZUL)
         self.tela.blit(self.imagem, self.imagem_rect)
         self.desenhar_texto()
@@ -56,6 +68,9 @@ class TelaFinal:
             texto = "Você ganhou!"
         elif self.outcome == "derrota":
             texto = "Que pena!"
+        else:
+            font = pygame.font.Font(None, 50)
+            texto = "Você terminou o jogo!"
 
         texto_surface = font.render(texto, True, PRETO)  
         texto_rect = texto_surface.get_rect()
@@ -66,8 +81,10 @@ class TelaFinal:
         font = pygame.font.Font(None, 40)
 
         # Desenha os botões
-        pygame.draw.rect(self.tela, BRANCO, self.retangulo_avancar)
-        pygame.draw.rect(self.tela, PRETO, self.retangulo_avancar, width=LARGURA_BORDA)
+        if self.outcome != "fim":
+            self.retangulo_mudar_fase = pygame.Rect(BOTAO_X, BOTAO_Y + (6 * ALTURA_BLOCO), LARGURA_BOTAO, ALTURA_BOTAO)
+            pygame.draw.rect(self.tela, BRANCO, self.retangulo_avancar)
+            pygame.draw.rect(self.tela, PRETO, self.retangulo_avancar, width=LARGURA_BORDA)
 
         pygame.draw.rect(self.tela, BRANCO, self.retangulo_mudar_fase)
         pygame.draw.rect(self.tela, PRETO, self.retangulo_mudar_fase, width=LARGURA_BORDA)
@@ -77,12 +94,15 @@ class TelaFinal:
             texto_avancar = font.render("Avançar", True, PRETO)
         elif self.outcome == "derrota":
             texto_avancar = font.render("Recomeçar", True, PRETO)
-        texto_mudar_fase = font.render("Mudar fase", True, PRETO)
+        else:
+            texto_avancar = font.render("", True, PRETO)
+        texto_mudar_fase = font.render("Tela inicial", True, PRETO)
 
         avancar_rect = texto_avancar.get_rect(center=self.retangulo_avancar.center)
         mudar_fase_rect = texto_mudar_fase.get_rect(center=self.retangulo_mudar_fase.center)
 
-        self.tela.blit(texto_avancar, avancar_rect)
+        if self.outcome != "fim":
+            self.tela.blit(texto_avancar, avancar_rect)
         self.tela.blit(texto_mudar_fase, mudar_fase_rect)
 
         return avancar_rect, mudar_fase_rect
