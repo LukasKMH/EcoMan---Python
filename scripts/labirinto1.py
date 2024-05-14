@@ -84,8 +84,10 @@ class Labirinto(object):
         
     def gerarInimigos(self, quantidade):
         for _ in range(quantidade):
-            novo_inimigo = Inimigo(self.nodes.startInimigos())
+            i = 22
+            novo_inimigo = Inimigo(self.nodes.startInimigos(i))
             self.lista_inimigos.append(novo_inimigo)
+            i += 1
 
     def checkInimigoEvento(self):
         for inimigo in self.lista_inimigos:
@@ -122,10 +124,7 @@ class Labirinto(object):
             nova_tela = QuizApp()  # Cria uma nova instância da tela desejada com a janela principal
             acertou = nova_tela.iniciar()  # Armazena o resultado retornado pelo método iniciar
             if acertou:
-                print("acertou")
                 self.atualizarPontuacao(1000)
-            else:
-                print("errou")
             
     def checkEvents(self):
         for event in pygame.event.get():

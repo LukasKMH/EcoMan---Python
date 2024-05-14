@@ -84,9 +84,10 @@ class Labirinto2(object):
         
     def gerarInimigos(self, quantidade):
         for _ in range(quantidade):
-            novo_inimigo = Inimigo(self.nodes.startInimigos())
+            i = 20
+            novo_inimigo = Inimigo(self.nodes.startInimigos(i))
             self.lista_inimigos.append(novo_inimigo)
-
+            i += 10
     def checkInimigoEvento(self):
         for inimigo in self.lista_inimigos:
             if self.ecoman.colideInimigo(inimigo):
@@ -120,8 +121,9 @@ class Labirinto2(object):
         if self.quest is not None and self.ecoman.collideCheck(self.quest):
             self.quest = None  # Faz o quest sumir da tela
             nova_tela = QuizApp()  # Cria uma nova instância da tela desejada com a janela principal
-            nova_tela.iniciar()
-            #self.pause.setPause(playerPaused=True)  # Pausa a tela atual do jogo
+            acertou = nova_tela.iniciar()  # Armazena o resultado retornado pelo método iniciar
+            if acertou:
+                self.atualizarPontuacao(1000)
 
                 
     def checkEvents(self):

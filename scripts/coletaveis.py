@@ -17,7 +17,6 @@ class Coletavel(object):
         self.collideRadius = int(2 * ALTURA_BLOCO / 16)
         self.sprites = ColetavelSprites(self, "assets/Imagens/coletavel.png")
 
-    # Pode ser usado para deixar os coletaveis piscando juntamente com as varaiveis flashTime e self.timer
     def update(self, dt):
         pass
 

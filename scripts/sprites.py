@@ -137,5 +137,3 @@ class NumeroVidas(object):
     def setImage(self, image_path):
         self.image_path = image_path
         self.images = [self.loadImage() for _ in range(len(self.images))]
-
-

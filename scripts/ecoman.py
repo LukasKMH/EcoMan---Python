@@ -68,7 +68,6 @@ class Ecoman(Personagem):
             return True
         return False
 
-    
     def reset(self):
         Personagem.reset(self)
         self.direction = ESQUERDA

@@ -21,8 +21,6 @@ BRANCO = (255, 255, 255)
 VERMELHO = (255, 0, 0)
 AZUL = (57,180,247)
 AZUL_CLARO = (124,255,255)
-# ROSA = (255,100,150)
-# TEAL = (100,255,255)
 LARANJA = (230,190,40)
 VERDE = (0, 255, 0)
 
@@ -32,12 +30,11 @@ CIMA = 1
 BAIXO = -1
 ESQUERDA = 2
 DIREITA = -2
-#PORTAL = 3
 
 ECOMAN = 0
 COLETAVEL = 1
-INIMIGO = 3
-QUEST = 8
+INIMIGO = 2
+QUEST = 3
 
 LIXO_RESTANTETXT = 1
 PONTUACAOTXT = 2
@@ -49,5 +46,3 @@ GAMEOVERTXT = 7
 
 # Sons
 SOM_COLISAO = pygame.mixer.Sound("assets/sons/coletar.wav")
-
-acertou = False

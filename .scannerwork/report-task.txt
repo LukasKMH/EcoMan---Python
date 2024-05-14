@@ -2,5 +2,5 @@ projectKey=Ecoman
 serverUrl=http://localhost:9000
 serverVersion=10.3.0.82913
 dashboardUrl=http://localhost:9000/dashboard?id=Ecoman
-ceTaskId=AY8M-B8cdpgA4Gowq5Fl
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AY8M-B8cdpgA4Gowq5Fl
+ceTaskId=AY8vPPHBlfn6W7jIqeY2
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AY8vPPHBlfn6W7jIqeY2

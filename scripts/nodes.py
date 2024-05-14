@@ -92,9 +92,9 @@ class NodeGroup(object):
         nodes = list(self.nodesLUT.values())
         return nodes[3]
     
-    def startInimigos(self):
+    def startInimigos(self, valor):
         nodes = list(self.nodesLUT.values())
-        return nodes[22]
+        return nodes[valor]
 
     def render(self, screen):
         for node in self.nodesLUT.values():
