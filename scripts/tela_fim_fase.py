@@ -41,18 +41,14 @@ class TelaFinal:
                     tela.executar()
                 elif self.retangulo_avancar.collidepoint(pos_mouse):
                     if self.outcome == "vitoria":
-                        if self.tela_chamadora.level == 1: 
-                            from scripts.labirinto2 import Labirinto2
-                            labirinto = Labirinto2()  
-                            labirinto.startGame()
+                        from scripts.labirinto1 import Labirinto
+                        if self.tela_chamadora.level == 1:  
+                            labirinto = Labirinto("assets/mapas/fase2.txt", "assets/mapas/fase2_rotacao.txt", 2, 4, 90, 2)  
                         elif self.tela_chamadora.level == 2:
-                            from scripts.labirinto3 import Labirinto3
-                            labirinto = Labirinto3()  
-                            labirinto.startGame()
+                            labirinto = Labirinto("assets/mapas/fase3.txt", "assets/mapas/fase3_rotacao.txt", 3, 3, 80, 3)
                         elif self.tela_chamadora.level == 3:
-                            from scripts.labirinto4 import Labirinto4
-                            labirinto = Labirinto4()  
-                            labirinto.startGame()
+                            labirinto = Labirinto("assets/mapas/fase4.txt", "assets/mapas/fase4_rotacao.txt", 4, 3, 70, 3)  
+                        labirinto.startGame()
                     elif self.outcome == "derrota":
                         self.tela_chamadora.restartGame()
                         

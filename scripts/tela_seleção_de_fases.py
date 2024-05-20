@@ -3,9 +3,6 @@ import sys
 from pygame.locals import *
 from scripts.constantes import *
 from scripts.labirinto1 import Labirinto
-from scripts.labirinto2 import Labirinto2
-from scripts.labirinto3 import Labirinto3
-from scripts.labirinto4 import Labirinto4
 
 class TelaSelecaoFases():
     def __init__(self):
@@ -45,17 +42,14 @@ class TelaSelecaoFases():
                     if botao.collidepoint(pos_mouse):
                         pygame.mixer.music.stop()
                         if i == 0:
-                            labirinto = Labirinto()  
-                            labirinto.startGame()
+                            labirinto = Labirinto("assets/mapas/fase1.txt", "assets/mapas/fase1_rotacao.txt", 1, 4, 100, 2)  
                         elif i == 1:
-                            labirinto = Labirinto2()  
-                            labirinto.startGame()
+                            labirinto = Labirinto("assets/mapas/fase2.txt", "assets/mapas/fase2_rotacao.txt", 2, 4, 90, 2)  
                         elif i == 2:
-                            labirinto = Labirinto3()  
-                            labirinto.startGame()
+                            labirinto = Labirinto("assets/mapas/fase3.txt", "assets/mapas/fase3_rotacao.txt", 3, 3, 80, 3)  
                         elif i == 3:
-                            labirinto = Labirinto4()  
-                            labirinto.startGame()
+                            labirinto = Labirinto("assets/mapas/fase4.txt", "assets/mapas/fase4_rotacao.txt", 4, 3, 70, 3)  
+                        labirinto.startGame()
 
         self.tela.fill(AZUL)
 

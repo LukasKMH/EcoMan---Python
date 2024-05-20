@@ -13,25 +13,30 @@ from scripts.sprites import NumeroVidas, LabirintoSprites
 from scripts.tela_fim_fase import TelaFinal
 from scripts.tela_pergunta import QuizApp
 
-from scripts.inimigo2 import GrupoInimigos
-
 class Labirinto(object):
-    def __init__(self):
+    def __init__(self, mapa, mapa_rotacao, level, vidas, segundos, numero_inimigos):
         pygame.init()
+        
+        self.vidas2 = vidas
+        self.segundos2 = segundos
+        
+        self.mapa = mapa
+        self.mapa_rotacao = mapa_rotacao
         self.screen = pygame.display.set_mode(TAMANHO_TELA, 0, 32)
         self.background = None
         self.clock = pygame.time.Clock()
         self.pause = Pause(False)
-        self.level = 1
-        self.vidas = 4
+        self.level = level
+        self.vidas = vidas
         self.score = 0
-        self.segundos = 100
+        self.segundos = segundos
         self.segundos_aux = 0
         self.textgroup = TextGroup()
-        self.nodes = NodeGroup("assets/mapas/fase1.txt") 
+        self.nodes = NodeGroup(self.mapa)
         self.lista_inimigos = []
-        self.gerarInimigos(2)
+        self.gerarInimigos(numero_inimigos)
         self.lifesprites = NumeroVidas(self.vidas, "assets/Imagens/vida.png")
+
 
     def setBackground(self):
         self.background = pygame.surface.Surface(TAMANHO_TELA).convert()
@@ -40,10 +45,10 @@ class Labirinto(object):
     def startGame(self):
         self.setBackground()
         self.quest = Quest(self.nodes.getStartTempNode())
-        self.mazesprites = LabirintoSprites("assets/mapas/fase1.txt", "assets/mapas/fase1_rotacao.txt")
+        self.mazesprites = LabirintoSprites(self.mapa, self.mapa_rotacao)
         self.background = self.mazesprites.constructBackground(self.background, self.level%5)
         self.ecoman = Ecoman(self.nodes.getStartTempNode())
-        self.coletaveis = GrupoColetaveis("assets/mapas/fase1.txt")
+        self.coletaveis = GrupoColetaveis(self.mapa)
         self.textgroup.atualizarPontuacao(self.score)
         self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
         self.lifesprites.resetLives(self.vidas)
@@ -108,11 +113,6 @@ class Labirinto(object):
         inimigo.setSpeed(150)
         self.ecoman.collideRadius = raio
 
-    def showEntities(self):
-        self.ecoman.visible = True
-        for inimigo in self.lista_inimigos:
-            inimigo.visble = True
-
     def hideEntities(self):
         self.ecoman.visible = False
         for inimigo in self.lista_inimigos:
@@ -148,18 +148,17 @@ class Labirinto(object):
             self.coletaveis.listaColetaveis.remove(coletaveis)
             self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
             if self.coletaveis.isEmpty():
-                resultado = TelaFinal("vitoria", self).executar()
+                self.nextLevel()
 
     def nextLevel(self):
-        self.showEntities() 
-        self.level += 1
-        self.pause.paused = True
-        resultado = TelaFinal("vitoria", self).executar()
+        if self.level != 4:
+            resultado = TelaFinal("vitoria", self).executar()
+        else:
+            resultado = TelaFinal("fim", self).executar()
 
     def restartGame(self):
-        self.vidas = 4
-        self.level = 1
-        self.segundos = 90
+        self.vidas = self.vidas2
+        self.segundos = self.segundos2
         self.segundos_aux = 0
         self.score = 0
         self.startGame()

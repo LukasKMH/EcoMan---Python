@@ -13,8 +13,6 @@ from scripts.sprites import NumeroVidas, LabirintoSprites
 from scripts.tela_fim_fase import TelaFinal
 from scripts.tela_pergunta import QuizApp
 
-from scripts.inimigo2 import GrupoInimigos
-
 class Labirinto2(object):
     def __init__(self):
         pygame.init()
