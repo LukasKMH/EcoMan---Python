@@ -8,44 +8,51 @@ from scripts.coletaveis import GrupoColetaveis
 from scripts.inimigo import Inimigo
 from scripts.quest import Quest
 from scripts.pause import Pause
-from scripts.texto import TextGroup
+from scripts.texto import GrupoTexto
 from scripts.sprites import NumeroVidas, LabirintoSprites
 from scripts.tela_fim_fase import TelaFinal
 from scripts.tela_pergunta import QuizApp
 
-class Labirinto2(object):
-    def __init__(self):
+class Labirinto(object):
+    def __init__(self, mapa, mapa_rotacao, level, vidas, segundos, numero_inimigos):
         pygame.init()
+        
+        self.vidas2 = vidas
+        self.segundos2 = segundos
+        
+        self.mapa = mapa
+        self.mapa_rotacao = mapa_rotacao
         self.screen = pygame.display.set_mode(TAMANHO_TELA, 0, 32)
         self.background = None
         self.clock = pygame.time.Clock()
         self.pause = Pause(False)
-        self.level = 2
-        self.vidas = 4
+        self.level = level
+        self.vidas = vidas
         self.score = 0
-        self.segundos = 90
+        self.segundos = segundos
         self.segundos_aux = 0
-        self.textgroup = TextGroup()
-        self.nodes = NodeGroup("assets/mapas/fase2.txt") 
+        self.textgroup = GrupoTexto()
+        self.nodes = NodeGroup(self.mapa)
         self.lista_inimigos = []
-        self.gerarInimigos(2)
+        self.gerar_inimigos(numero_inimigos)
         self.lifesprites = NumeroVidas(self.vidas, "assets/Imagens/vida.png")
 
-    def setBackground(self):
+
+    def definir_fundo(self):
         self.background = pygame.surface.Surface(TAMANHO_TELA).convert()
         self.background.fill(AZUL)
 
-    def startGame(self):
-        self.setBackground()
+    def iniciar_jogo(self):
+        self.definir_fundo()
         self.quest = Quest(self.nodes.getStartTempNode())
-        self.mazesprites = LabirintoSprites("assets/mapas/fase2.txt", "assets/mapas/fase2_rotacao.txt")
+        self.mazesprites = LabirintoSprites(self.mapa, self.mapa_rotacao)
         self.background = self.mazesprites.constructBackground(self.background, self.level%5)
         self.ecoman = Ecoman(self.nodes.getStartTempNode())
-        self.coletaveis = GrupoColetaveis("assets/mapas/fase2.txt")
-        self.textgroup.atualizarPontuacao(self.score)
-        self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
-        self.lifesprites.resetLives(self.vidas)
-        self.atualizarTempo()
+        self.coletaveis = GrupoColetaveis(self.mapa)
+        self.textgroup.atualizar_pontuacao(self.score)
+        self.textgroup.atualizar_lixo(len(self.coletaveis.lista_coletaveis) - 1)
+        self.lifesprites.reset_vidas(self.vidas)
+        self.atualizar_tempo()
         while True:
             self.update()
 
@@ -53,120 +60,106 @@ class Labirinto2(object):
         dt = self.clock.tick(60) / 1000.0
         self.segundos_aux += 1
         self.textgroup.update(dt)
-        self.coletaveis.update(dt)
-        if not self.pause.paused:
+        if not self.pause.pausado:
             self.ecoman.update(dt)
             for inimigo in self.lista_inimigos:
                 inimigo.update(dt)
             if self.quest is not None:
                 self.quest.update(dt)
-            self.checkColetaveisEvento()
-            if self.ecoman.collideRadius != 0:
-                self.checkInimigoEvento()
-            self.checkQuestEvento()
-            self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
+            self.verificar_evento_coletavel()
+            if self.ecoman.raio_colisao != 0:
+                self.verficiar_evento_inimigo()
+            self.verificar_evento_quest()
+            self.textgroup.atualizar_lixo(len(self.coletaveis.lista_coletaveis) - 1)
             if self.segundos_aux >= 60:
                 self.segundos_aux = 0
                 self.segundos -= 1
-                self.atualizarTempo()
+                self.atualizar_tempo()
 
-        afterPauseMethod = self.pause.update(dt)
-        if afterPauseMethod is not None:
-            afterPauseMethod()
-        self.checkEvents()
+        depois_pausado = self.pause.update(dt)
+        if depois_pausado is not None:
+            depois_pausado()
+        self.verificar_evento()
         self.render()
 
-    def atualizarTempo(self):
-        if not self.textgroup.atualizarTempo(self.segundos):
+    def atualizar_tempo(self):
+        if not self.textgroup.atualizar_tempo(self.segundos):
             resultado = TelaFinal("derrota", self).executar()
         
-    def gerarInimigos(self, quantidade):
+    def gerar_inimigos(self, quantidade):
         for _ in range(quantidade):
-            i = 20
+            i = 22
             novo_inimigo = Inimigo(self.nodes.startInimigos(i))
             self.lista_inimigos.append(novo_inimigo)
-            i += 10
-    def checkInimigoEvento(self):
+            i += 1
+
+    def verficiar_evento_inimigo(self):
         for inimigo in self.lista_inimigos:
             if self.ecoman.colideInimigo(inimigo):
                 if self.ecoman.vivo:
                     self.vidas -=  1
-                    self.lifesprites.removeImage()
-                    raio = self.ecoman.collideRadius
-                    self.ecoman.collideRadius = 0
+                    self.lifesprites.remover_imagem()
+                    raio = self.ecoman.raio_colisao
+                    self.ecoman.raio_colisao = 0
                     if self.vidas == 0:
                         resultado = TelaFinal("derrota", self).executar()
                     else:
-                        self.pause.setPause(pauseTime=0.5)  
-                inimigo.setSpeed(70)
-                threading.Timer(2, self.restaurarVelocidade, args=[inimigo, raio]).start()
+                        self.pause.pausar(tempo_pausa=0.5)  
+                inimigo.definir_velocidade(10)
+                threading.Timer(2, self.restaurar_velocidade, args=[inimigo, raio]).start()
 
-    def restaurarVelocidade(self, inimigo, raio):
-        inimigo.setSpeed(150)
-        self.ecoman.collideRadius = raio
-
-    def showEntities(self):
-        self.ecoman.visible = True
-        for inimigo in self.lista_inimigos:
-            inimigo.visble = True
-
-    def hideEntities(self):
-        self.ecoman.visible = False
-        for inimigo in self.lista_inimigos:
-            inimigo.visble = False
+    def restaurar_velocidade(self, inimigo, raio):
+        inimigo.definir_velocidade(150)
+        self.ecoman.raio_colisao = raio
     
-    def checkQuestEvento(self):
+    def verificar_evento_quest(self):
         if self.quest is not None and self.ecoman.collideCheck(self.quest):
             self.quest = None  # Faz o quest sumir da tela
             nova_tela = QuizApp()  # Cria uma nova instância da tela desejada com a janela principal
             acertou = nova_tela.iniciar()  # Armazena o resultado retornado pelo método iniciar
             if acertou:
-                self.atualizarPontuacao(1000)
-
-                
-    def checkEvents(self):
+                self.atualizar_pontuacao(1000)
+            
+    def verificar_evento(self):
         for event in pygame.event.get():
             if event.type == QUIT:
                 exit()
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     if self.ecoman.vivo:
-                        self.pause.setPause(playerPaused=True)
-                    if not self.pause.paused:
-                        self.textgroup.hideText()
-                    #     self.showEntities()
+                        self.pause.pausar()
+                    if not self.pause.pausado:
+                        self.textgroup.esconder_texto()
                     else:
-                        self.textgroup.showText(PAUSETXT)
-                    #     self.hideEntities()
+                        self.textgroup.mostrar_texto(PAUSETXT)
 
-    def checkColetaveisEvento(self):
-        coletaveis = self.ecoman.coletar(self.coletaveis.listaColetaveis)
+    def verificar_evento_coletavel(self):
+        coletaveis = self.ecoman.coletar(self.coletaveis.lista_coletaveis)
         if coletaveis:
             SOM_COLISAO.play()
-            self.coletaveis.numEaten += 1
-            self.atualizarPontuacao(coletaveis.points)
-            self.coletaveis.listaColetaveis.remove(coletaveis)
-            self.textgroup.atualizarLixoRestante(len(self.coletaveis.listaColetaveis) - 1)
-            if self.coletaveis.isEmpty():
-                resultado = TelaFinal("vitoria", self).executar()
+            self.coletaveis.coletados += 1
+            self.atualizar_pontuacao(coletaveis.pontuacao)
+            self.coletaveis.lista_coletaveis.remove(coletaveis)
+            self.textgroup.atualizar_lixo(len(self.coletaveis.lista_coletaveis) - 1)
+            if self.coletaveis.esta_vazio():
+                self.proximo_level()
 
-    def nextLevel(self):
-        self.showEntities() 
-        self.level += 1
-        self.pause.paused = True
-        resultado = TelaFinal("vitoria", self).executar()
+    def proximo_level(self):
+        if self.level != 4:
+            TelaFinal("vitoria", self).executar()
+        else:
+            TelaFinal("fim", self).executar()
 
-    def restartGame(self):
-        self.vidas = 4
-        self.level = 1
-        self.segundos = 90
+    def restart_game(self):
+        self.vidas = self.vidas2
+        self.segundos = self.segundos2
         self.segundos_aux = 0
         self.score = 0
-        self.startGame()
+        self.iniciar_jogo()
 
-    def atualizarPontuacao(self, points):
-        self.score += points
-        self.textgroup.atualizarPontuacao(self.score)
+    def atualizar_pontuacao(self, pontuacao):
+        self.score += pontuacao
+        self.textgroup.atualizar_pontuacao(self.score)
 
     def render(self):
         self.screen.blit(self.background, (0, 0))
@@ -185,7 +178,7 @@ class Labirinto2(object):
         pygame.display.update()
 
 if __name__ == "__main__":
-    game = Labirinto2()
-    game.startGame()
+    game = Labirinto()
+    game.iniciar_jogo()
     while True:
         game.update()

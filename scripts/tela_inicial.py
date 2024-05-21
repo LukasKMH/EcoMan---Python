@@ -89,8 +89,3 @@ class TelaInicial:
                     pygame.quit()
                     sys.exit()
                 return retorno
-
-
-# if __name__ == "__main__":
-#     tela_inicial = TelaInicial()
-#     tela_inicial.executar()

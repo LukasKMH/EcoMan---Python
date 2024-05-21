@@ -15,7 +15,7 @@ class Spritesheet(object):
         height = int(self.sheet.get_height() / ALTURA_BLOCO_BASE * ALTURA_BLOCO)
         self.sheet = pygame.transform.scale(self.sheet, (width, height))
         
-    def getImage(self, x, y, width, height):
+    def pegar_imagem(self, x, y, width, height):
         x *= LARGURA_BLOCO
         y *= ALTURA_BLOCO
         self.sheet.set_clip(pygame.Rect(x, y, width, height))
@@ -27,8 +27,8 @@ class LabirintoSprites(Spritesheet):
         self.data = self.readMazeFile(mazefile)
         self.rotdata = self.readMazeFile(rotfile)
 
-    def getImage(self, x, y):
-        return Spritesheet.getImage(self, x, y, LARGURA_BLOCO, ALTURA_BLOCO)
+    def pegar_imagem(self, x, y):
+        return Spritesheet.pegar_imagem(self, x, y, LARGURA_BLOCO, ALTURA_BLOCO)
 
     def readMazeFile(self, mazefile):
         return np.loadtxt(mazefile, dtype='<U1')
@@ -78,22 +78,19 @@ class EcomanSprites(object):
 
     def update(self):
         if self.entidade.vivo:
-            if self.entidade.direction == CIMA:
+            if self.entidade.direcao == CIMA:
                 self.entidade.image = self.images["cima"]
-            elif self.entidade.direction == BAIXO:
+            elif self.entidade.direcao == BAIXO:
                 self.entidade.image = self.images["baixo"]
-            elif self.entidade.direction == ESQUERDA:
+            elif self.entidade.direcao == ESQUERDA:
                 self.entidade.image = self.images["esquerda"]
-            elif self.entidade.direction == DIREITA:
+            elif self.entidade.direcao == DIREITA:
                 self.entidade.image = self.images["direita"]
 
 class ColetavelSprites(object):
     def __init__(self, coletavel, image_path):
         self.coletavel = coletavel
         self.image = pygame.image.load(image_path).convert_alpha()
-
-    # def setImage(self, image_path):
-    #     self.image = pygame.image.load(image_path).convert_alpha()
 
 class InimigoSprites(object):
     def __init__(self, entidade, image_path):
@@ -107,33 +104,33 @@ class InimigoSprites(object):
         self.entidade.image = self.images["direita"]
 
     def update(self):
-        if self.entidade.direction == CIMA:
+        if self.entidade.direcao == CIMA:
             self.entidade.image = self.images["cima"]
-        elif self.entidade.direction == BAIXO:
+        elif self.entidade.direcao == BAIXO:
             self.entidade.image = self.images["baixo"]
-        elif self.entidade.direction == ESQUERDA:
+        elif self.entidade.direcao == ESQUERDA:
             self.entidade.image = self.images["esquerda"]
-        elif self.entidade.direction == DIREITA:
+        elif self.entidade.direcao == DIREITA:
             self.entidade.image = self.images["direita"]
 
 class NumeroVidas(object):
     def __init__(self, numlives, image_path):
         self.images = []
         self.image_path = image_path
-        self.resetLives(numlives)
+        self.reset_vidas(numlives)
 
-    def removeImage(self):
+    def remover_imagem(self):
         if len(self.images) > 0:
             self.images.pop(0)
 
-    def resetLives(self, numlives):
+    def reset_vidas(self, numlives):
         self.images = []
         for i in range(numlives):
-            self.images.append(self.loadImage())
+            self.images.append(self.carregar_imagem())
 
-    def loadImage(self):
+    def carregar_imagem(self):
         return pygame.image.load(self.image_path).convert_alpha()
 
-    def setImage(self, image_path):
+    def definir_imagem(self, image_path):
         self.image_path = image_path
-        self.images = [self.loadImage() for _ in range(len(self.images))]
+        self.images = [self.carregar_imagem() for _ in range(len(self.images))]

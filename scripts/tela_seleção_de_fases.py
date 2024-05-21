@@ -2,7 +2,7 @@ import pygame
 import sys
 from pygame.locals import *
 from scripts.constantes import *
-from scripts.labirinto1 import Labirinto
+from scripts.labirinto import Labirinto
 
 class TelaSelecaoFases():
     def __init__(self):
@@ -31,10 +31,10 @@ class TelaSelecaoFases():
     def desenhar_tela(self):
         self.clock.tick(FPS)
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
                 return "quit"
-            elif event.type == MOUSEBUTTONDOWN:
+            elif evento.type == MOUSEBUTTONDOWN:
                 pos_mouse = pygame.mouse.get_pos()
                 if self.botao_voltar_rect.collidepoint(pos_mouse):
                     return "tela_inicial"
@@ -49,7 +49,7 @@ class TelaSelecaoFases():
                             labirinto = Labirinto("assets/mapas/fase3.txt", "assets/mapas/fase3_rotacao.txt", 3, 3, 80, 3)  
                         elif i == 3:
                             labirinto = Labirinto("assets/mapas/fase4.txt", "assets/mapas/fase4_rotacao.txt", 4, 3, 70, 3)  
-                        labirinto.startGame()
+                        labirinto.iniciar_jogo()
 
         self.tela.fill(AZUL)
 

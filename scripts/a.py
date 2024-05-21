@@ -24,12 +24,9 @@ class Personagem(object):
         self.posicao = self.node.posicao.copy()
           
     def validar_direcao(self, direction):
-        if direction is not PARAR:
-            if self.node.vizinhos[direction] is not None:
-                return True
-        return False
+        return direction != PARAR and self.node.vizinhos[direction] is not None
 
-    def novo_alvo(self, direction):
+    def definir_alvo(self, direction):
         if self.validar_direcao(direction):
             return self.node.vizinhos[direction]
         return self.node
@@ -38,9 +35,9 @@ class Personagem(object):
         if self.alvo is not None:
             vec1 = self.alvo.posicao - self.node.posicao
             vec2 = self.posicao - self.node.posicao
-            node2Target = vec1.magnitude_quadrada()
-            node2Self = vec2.magnitude_quadrada()
-            return node2Self >= node2Target
+            node2_alvo = vec1.magnitude_quadrada()
+            node2_self = vec2.magnitude_quadrada()
+            return node2_self >= node2_alvo
         return False
 
     def reverter_direcao(self):
@@ -50,10 +47,7 @@ class Personagem(object):
         self.alvo = temp
         
     def direcao_oposta(self, direction):
-        if direction is not PARAR:
-            if direction == self.direcao * -1:
-                return True
-        return False
+        return direction != PARAR and direction == self.direcao * -1
 
     def definir_velocidade(self, speed):
         self.speed = speed * LARGURA_BLOCO / 16
@@ -63,32 +57,31 @@ class Personagem(object):
          
         if self.ultrapassou_alvo():
             self.node = self.alvo
-            directions = self.validar_direcoes()
+            directions = self.validar_direcao()
             direction = self.direcao_aleatoria(directions)   
-            self.alvo = self.getNewTarget(direction)
+            self.alvo = self.definir_alvo(direction)
             if self.alvo is not self.node:
                 self.direcao = direction
             else:
-                self.alvo = self.getNewTarget(self.direcao)
+                self.alvo = self.definir_alvo(self.direcao)
 
             self.definir_posicao()
 
-    def validar_direcoes(self):
-        directions = []
-        for key in [CIMA, BAIXO, ESQUERDA, DIREITA]:
-            if self.validar_direcao(key):
-                if key != self.direcao * -1:
-                    directions.append(key)
-        if len(directions) == 0:
-            directions.append(self.direcao * -1)
-        return directions
+    def validar_direcao(self):
+        direcoes = [
+            key for key in [CIMA, BAIXO, ESQUERDA, DIREITA]
+            if self.validar_direcao(key) and key != self.direcao * -1
+        ]
+        if not direcoes:
+            direcoes.append(self.direcao * -1)
+        return direcoes
 
-    def direcao_aleatoria(self, directions):
-        return directions[randint(0, len(directions)-1)]
+    def direcao_aleatoria(self, direcoes):
+        return direcoes[randint(0, len(direcoes)-1)]
     
-    def entre_os_nos(self, direction):
-        if self.node.vizinhos[direction] is not None:
-            self.alvo = self.node.vizinhos[direction]
+    def entre_os_nos(self, direcao):
+        if self.node.vizinhos[direcao] is not None:
+            self.alvo = self.node.vizinhos[direcao]
             self.posicao = (self.node.posicao + self.alvo.posicao) / 2.0
 
     def reset(self):
@@ -102,8 +95,8 @@ class Personagem(object):
             if self.image is not None:
                 adjust = Vector2(LARGURA_BLOCO, ALTURA_BLOCO) / 2
                 p = self.posicao - adjust
-                screen.blit(self.image, p.forma_tupla())
+                screen.blit(self.image, p.asTuple())
             else:
-                p = self.posicao.forma_inteiro()
+                p = self.posicao.asInt()
                 pygame.draw.circle(screen, self.cor, p, self.raio)
             

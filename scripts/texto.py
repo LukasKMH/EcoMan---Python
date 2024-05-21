@@ -3,29 +3,29 @@ from scripts.vetor import Vector2
 from scripts.constantes import *
 
 class Text(object):
-    def __init__(self, text, color, x, y, size, time=None, id=None, visible=True):
+    def __init__(self, texto, cor, x, y, tamanho, time=None, id=None, visivel=True):
         self.id = id
-        self.text = text
-        self.color = color
-        self.size = size
-        self.visible = visible
-        self.position = Vector2(x, y)
+        self.texto = texto
+        self.cor = cor
+        self.tamanho = tamanho
+        self.visivel = visivel
+        self.posicao = Vector2(x, y)
         self.timer = 0
         self.lifespan = time
         self.label = None
         self.destroy = False
-        self.setupFont("PressStart2P-Regular.ttf")
-        self.createLabel()
+        self.definir_fonte("PressStart2P-Regular.ttf")
+        self.criar_label()
 
-    def setupFont(self, fontpath):
-        self.font = pygame.font.Font(fontpath, self.size)
+    def definir_fonte(self, fontpath):
+        self.font = pygame.font.Font(fontpath, self.tamanho)
 
-    def createLabel(self):
-        self.label = self.font.render(self.text, 1, self.color)
+    def criar_label(self):
+        self.label = self.font.render(self.texto, 1, self.cor)
 
-    def setText(self, newtext):
-        self.text = str(newtext)
-        self.createLabel()
+    def definir_texto(self, newtext):
+        self.texto = str(newtext)
+        self.criar_label()
 
     def update(self, dt):
         if self.lifespan is not None:
@@ -36,70 +36,70 @@ class Text(object):
                 self.destroy = True
 
     def render(self, screen):
-        if self.visible:
-            x, y = self.position.asTuple()
+        if self.visivel:
+            x, y = self.posicao.forma_tupla()
             screen.blit(self.label, (x, y))
 
-class TextGroup(object):
+class GrupoTexto(object):
     def __init__(self):
-        self.nextid = 10
-        self.alltext = {}
-        self.setupText()
+        self.proximo_id = 10
+        self.textos = {}
+        self.configurar_texto()
 
-    def addText(self, text, color, x, y, size, time=None, id=None):
-        self.nextid += 1
-        self.alltext[self.nextid] = Text(text, color, x, y, size, time=time, id=id)
-        return self.nextid
+    def adicionar_texto(self, text, cor, x, y, tamanho, time=None, id=None):
+        self.proximo_id += 1
+        self.textos[self.proximo_id] = Text(text, cor, x, y, tamanho, time=time, id=id)
+        return self.proximo_id
 
-    def removeText(self, id):
-        self.alltext.pop(id)
+    def remover_texto(self, id):
+        self.textos.pop(id)
         
-    def setupText(self):
-        size = ALTURA_BLOCO
-        self.alltext[LIXO_RESTANTETXT] = Text(str(1).zfill(2), BRANCO, 6*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
-        self.alltext[TEMPOTXT] = Text("1:50", BRANCO, 24*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
-        self.alltext[PONTUACAOTXT] = Text("0".zfill(4), BRANCO, 41*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
-        self.alltext[PAUSETXT] = Text("JOGO PAUSADO", AMARELO, LARGURA_TELA // 2 - LARGURA_BLOCO * 6, ALTURA_TELA / 2, size, visible=False)
-        self.addText("LIXO:", BRANCO, 1*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
-        self.addText("TEMPO:", BRANCO, 18*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
-        self.addText("PONTOS:", BRANCO, 34*LARGURA_BLOCO, 2*ALTURA_BLOCO, size)
+    def configurar_texto(self):
+        tamanho = ALTURA_BLOCO
+        self.textos[LIXO_RESTANTETXT] = Text(str(1).zfill(2), BRANCO, 6*LARGURA_BLOCO, 2*ALTURA_BLOCO, tamanho)
+        self.textos[TEMPOTXT] = Text("1:50", BRANCO, 24*LARGURA_BLOCO, 2*ALTURA_BLOCO, tamanho)
+        self.textos[PONTUACAOTXT] = Text("0".zfill(4), BRANCO, 41*LARGURA_BLOCO, 2*ALTURA_BLOCO, tamanho)
+        self.textos[PAUSETXT] = Text("JOGO PAUSADO", AMARELO, LARGURA_TELA // 2 - LARGURA_BLOCO * 6, ALTURA_TELA / 2, tamanho, visivel=False)
+        self.adicionar_texto("LIXO:", BRANCO, 1*LARGURA_BLOCO, 2*ALTURA_BLOCO, tamanho)
+        self.adicionar_texto("TEMPO:", BRANCO, 18*LARGURA_BLOCO, 2*ALTURA_BLOCO, tamanho)
+        self.adicionar_texto("PONTOS:", BRANCO, 34*LARGURA_BLOCO, 2*ALTURA_BLOCO, tamanho)
 
     def update(self, dt):
-        for tkey in list(self.alltext.keys()):
-            self.alltext[tkey].update(dt)
-            if self.alltext[tkey].destroy:
-                self.removeText(tkey)
+        for texto in list(self.textos.keys()):
+            self.textos[texto].update(dt)
+            if self.textos[texto].destroy:
+                self.remover_texto(texto)
 
-    def showText(self, id):
-        self.hideText()
-        self.alltext[id].visible = True
+    def mostrar_texto(self, id):
+        self.esconder_texto()
+        self.textos[id].visivel = True
 
-    def hideText(self):
-        self.alltext[PAUSETXT].visible = False
+    def esconder_texto(self):
+        self.textos[PAUSETXT].visivel = False
 
-    def atualizarLixoRestante(self, quantidade_restante):
-        self.updateText(LIXO_RESTANTETXT, str(quantidade_restante + 1).zfill(2))
+    def atualizar_lixo(self, quantidade_restante):
+        self.atualizar_texto(LIXO_RESTANTETXT, str(quantidade_restante + 1).zfill(2))
 
-    def atualizarTempo(self, segundos):
+    def atualizar_tempo(self, segundos):
         if segundos != 0:
-            if TEMPOTXT in self.alltext:
-                self.updateText(TEMPOTXT, self.formatarTempo(segundos))
+            if TEMPOTXT in self.textos:
+                self.atualizar_texto(TEMPOTXT, self.formatar_tempo(segundos))
                 return True
             else:
                 return False
 
-    def formatarTempo(self, segundos):
+    def formatar_tempo(self, segundos):
         minutos = segundos // 60
         segundos %= 60
         return "{:02}:{:02}".format(int(minutos), int(segundos))
 
-    def atualizarPontuacao(self, score):
-        self.updateText(PONTUACAOTXT, str(score).zfill(4))
+    def atualizar_pontuacao(self, score):
+        self.atualizar_texto(PONTUACAOTXT, str(score).zfill(4))
 
-    def updateText(self, id, value):
-        if id in self.alltext.keys():
-            self.alltext[id].setText(value)
+    def atualizar_texto(self, id, value):
+        if id in self.textos.keys():
+            self.textos[id].definir_texto(value)
 
     def render(self, screen):
-        for tkey in list(self.alltext.keys()):
-            self.alltext[tkey].render(screen)
+        for texto in list(self.textos.keys()):
+            self.textos[texto].render(screen)

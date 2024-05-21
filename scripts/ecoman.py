@@ -9,34 +9,34 @@ from scripts.sprites import EcomanSprites
 class Ecoman(Personagem):
     def __init__(self, node):
         Personagem.__init__(self, node)
-        self.name = ECOMAN
-        self.direction = PARAR
-        self.radius = 10
-        self.collideRadius = self.radius * 0.9
-        self.color = LARANJA
-        self.setSpeed(250)
+        self.nome = ECOMAN
+        self.direcao = PARAR
+        self.raio = 10
+        self.raio_colisao = self.raio * 0.9
+        self.cor = LARANJA
+        self.definir_velocidade(250)
         self.vivo = True
         self.sprite = EcomanSprites(self, "assets/Imagens/ecoman/")
         
     def update(self, dt):
-        self.position += self.directions[self.direction]*self.speed*dt
+        self.posicao += self.direcoes[self.direcao]*self.speed*dt
         direction = self.getValidKey()
         self.sprite.update()
         
-        if self.overshotTarget():
-            self.node = self.target
-            self.target = self.getNewTarget(direction)
-            if self.target is not self.node:
-                self.direction = direction
+        if self.ultrapassou_alvo():
+            self.node = self.alvo
+            self.alvo = self.novo_alvo(direction)
+            if self.alvo is not self.node:
+                self.direcao = direction
             else:
-                self.target = self.getNewTarget(self.direction)
+                self.alvo = self.novo_alvo(self.direcao)
 
-            if self.target is self.node:
-                self.direction = PARAR
-            self.setPosition()
+            if self.alvo is self.node:
+                self.direcao = PARAR
+            self.definir_posicao()
         else: 
-            if self.oppositeDirection(direction):
-                self.reverseDirection()
+            if self.direcao_oposta(direction):
+                self.reverter_direcao()
 
     # Movimento
     def getValidKey(self):
@@ -51,8 +51,8 @@ class Ecoman(Personagem):
             return DIREITA
         return PARAR
 
-    def coletar(self, listaColetaveis):
-        for coletavel in listaColetaveis:
+    def coletar(self, lista_coletaveis):
+        for coletavel in lista_coletaveis:
             if self.collideCheck(coletavel):
                 return coletavel
         return None 
@@ -61,19 +61,19 @@ class Ecoman(Personagem):
         return self.collideCheck(inimigo)
 
     def collideCheck(self, other):
-        d = self.position - other.position
-        dSquared = d.magnitudeSquared()
-        rSquared = (self.radius + other.radius)**2
-        if dSquared <= rSquared:
+        distancia = self.posicao - other.posicao
+        dist_quadrado = distancia.magnitude_quadrada()
+        raio_quadrado = (self.raio + other.raio)**2
+        if dist_quadrado <= raio_quadrado:
             return True
         return False
 
     def reset(self):
         Personagem.reset(self)
-        self.direction = ESQUERDA
-        self.setBetweenNodes(ESQUERDA)
+        self.direcao = ESQUERDA
+        self.entre_os_nos(ESQUERDA)
         self.alive = True
 
     def die(self):
         self.alive = False
-        self.direction = PARAR
+        self.direcao = PARAR

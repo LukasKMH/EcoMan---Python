@@ -5,16 +5,16 @@ from scripts.constantes import *
 
 class Node(object):
     def __init__(self, x, y):
-        self.position = Vector2(x, y)
-        self.neighbors = {CIMA:None, BAIXO:None, ESQUERDA:None, DIREITA:None}
+        self.posicao = Vector2(x, y)
+        self.vizinhos = {CIMA:None, BAIXO:None, ESQUERDA:None, DIREITA:None}
 
     def render(self, screen):
-        for n in self.neighbors.keys():
-            if self.neighbors[n] is not None:
-                line_start = self.position.asTuple()
-                line_end = self.neighbors[n].position.asTuple()
+        for n in self.vizinhos.keys():
+            if self.vizinhos[n] is not None:
+                line_start = self.posicao.forma_tupla()
+                line_end = self.vizinhos[n].posicao.asTuple()
                 pygame.draw.line(screen, BRANCO, line_start, line_end, 4)
-                pygame.draw.circle(screen, VERMELHO, self.position.asInt(), 12)
+                pygame.draw.circle(screen, VERMELHO, self.posicao.forma_inteiro(), 12)
 
 
 class NodeGroup(object):
@@ -25,8 +25,8 @@ class NodeGroup(object):
         self.pathSymbols = ['.', '-', '|', 'p', 'P', 'E', 'I']
         data = self.readMazeFile(level)
         self.createNodeTable(data)
-        self.connectHorizontally(data)
-        self.connectVertically(data)
+        self.conectar_horizontal(data)
+        self.conectar_vertical(data)
 
     def readMazeFile(self, textfile):
         return np.loadtxt(textfile, dtype='<U1')
@@ -42,7 +42,7 @@ class NodeGroup(object):
         return x * LARGURA_BLOCO, y * ALTURA_BLOCO
     
     # Conectar os nós na horizontal
-    def connectHorizontally(self, data, xoffset=0, yoffset=0):
+    def conectar_horizontal(self, data, xoffset=0, yoffset=0):
         for row in list(range(data.shape[0])):
             key = None
             for col in list(range(data.shape[1])):
@@ -51,14 +51,14 @@ class NodeGroup(object):
                         key = self.constructKey(col+xoffset, row+yoffset)
                     else:
                         otherkey = self.constructKey(col+xoffset, row+yoffset)
-                        self.nodesLUT[key].neighbors[DIREITA] = self.nodesLUT[otherkey]
-                        self.nodesLUT[otherkey].neighbors[ESQUERDA] = self.nodesLUT[key]
+                        self.nodesLUT[key].vizinhos[DIREITA] = self.nodesLUT[otherkey]
+                        self.nodesLUT[otherkey].vizinhos[ESQUERDA] = self.nodesLUT[key]
                         key = otherkey
                 elif data[row][col] not in self.pathSymbols:
                     key = None
 
     # Conectar os nós na vertical
-    def connectVertically(self, data, xoffset=0, yoffset=0):
+    def conectar_vertical(self, data, xoffset=0, yoffset=0):
         dataT = data.transpose()
         for col in list(range(dataT.shape[0])):
             key = None
@@ -68,8 +68,8 @@ class NodeGroup(object):
                         key = self.constructKey(col+xoffset, row+yoffset)
                     else:
                         otherkey = self.constructKey(col+xoffset, row+yoffset)
-                        self.nodesLUT[key].neighbors[BAIXO] = self.nodesLUT[otherkey]
-                        self.nodesLUT[otherkey].neighbors[CIMA] = self.nodesLUT[key]
+                        self.nodesLUT[key].vizinhos[BAIXO] = self.nodesLUT[otherkey]
+                        self.nodesLUT[otherkey].vizinhos[CIMA] = self.nodesLUT[key]
                         key = otherkey
                 elif dataT[col][row] not in self.pathSymbols:
                     key = None

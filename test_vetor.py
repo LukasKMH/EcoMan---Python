@@ -53,14 +53,14 @@ class TestVector2(unittest.TestCase):
         Testa a conversão do vetor para uma tupla.
         """
         v = Vector2(7, 8)
-        self.assertEqual(v.asTuple(), (7, 8))
+        self.assertEqual(v.forma_tupla(), (7, 8))
 
     def test_as_int(self):
         """
         Testa a conversão dos componentes do vetor para inteiros.
         """
         v = Vector2(7.9, 8.1)
-        self.assertEqual(v.asInt(), (7, 8))
+        self.assertEqual(v.forma_inteiro(), (7, 8))
 
     def test_str(self):
         """

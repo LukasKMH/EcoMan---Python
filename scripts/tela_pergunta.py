@@ -1,3 +1,6 @@
+#VERIFICAR AQUI, PAREI AQUI DE BAIXO PARA CIMA
+
+
 import tkinter as tk
 from tkinter import ttk, messagebox
 from ttkbootstrap import Style
@@ -11,11 +14,11 @@ class QuizApp(object):
         self.janela = tk.Tk()
         self.janela.title("Pergunta")
         self.janela.geometry("500x500")
-        self.style = Style(theme="flatly")
+        self.estilo = Style(theme="flatly")
         self.acertou = None
         # Configure the font size for the question and escolha buttons
-        self.style.configure("TLabel", font=("Helvetica", 18))
-        self.style.configure("TButton", font=("Helvetica", 12), background='#eab676', foreground='#000000')  # Definindo a cor de fundo dos botões
+        self.estilo.configure("TLabel", font=("Helvetica", 18))
+        self.estilo.configure("TButton", font=("Helvetica", 12), background='#eab676', foreground='#000000')  # Definindo a cor de fundo dos botões
 
         # Create the question label
         self.titulo_pergunta = ttk.Label(
@@ -27,14 +30,14 @@ class QuizApp(object):
         self.titulo_pergunta.pack(pady=10)
 
         # Create the escolha buttons
-        self.choice_btns = []
+        self.botao_escolha = []
         for i in range(3):
             button = ttk.Button(
                 self.janela,
                 command=lambda i=i: self.verificar_resposta(i),
             )
             button.pack(pady=(20, 0), padx=20, fill='x')  # Adiciona margem superior de 5 pixels e margem inferior de 0 pixels
-            self.choice_btns.append(button)
+            self.botao_escolha.append(button)
 
         # Create the feedback label
         self.feedback_label = ttk.Label(
@@ -53,14 +56,14 @@ class QuizApp(object):
         # Display the choices on the buttons
         escolhas = self.pergunta_atual["escolhas"]
         for i in range(3):
-            self.choice_btns[i].config(text=escolhas[i], state="normal")
-            self.ajustar_texto_botao(self.choice_btns[i], escolhas[i])  # Chame a função para ajustar o texto do botão
+            self.botao_escolha[i].config(text=escolhas[i], state="normal")
+            self.ajustar_texto_botao(self.botao_escolha[i], escolhas[i])  # Chame a função para ajustar o texto do botão
 
         # Clear the feedback label
         self.feedback_label.config(text="")
 
     def verificar_resposta(self, escolha):
-        resposta_selecionada = self.choice_btns[escolha].cget("text")
+        resposta_selecionada = self.botao_escolha[escolha].cget("text")
         if resposta_selecionada == self.pergunta_atual["resposta"]:
             self.feedback_label.config(text="Correto!", foreground="green")
             self.acertou = True
@@ -68,8 +71,8 @@ class QuizApp(object):
             self.feedback_label.config(text="Incorreto!", foreground="red")
             self.acertou = False
 
-        for button in self.choice_btns:
-            button.config(state="disabled")
+        for botao in self.botao_escolha:
+            botao.config(state="disabled")
         self.janela.after(1000, self.fechar_janela)
 
     def fechar_janela(self):

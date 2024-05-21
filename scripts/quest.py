@@ -11,7 +11,7 @@ class Quest(Personagem):
         self.timer = 0
         self.destroy = False
         self.points = 100
-        self.setBetweenNodes(DIREITA)
+        self.entre_os_nos(DIREITA)
 
     def update(self, dt):
         self.timer += dt
