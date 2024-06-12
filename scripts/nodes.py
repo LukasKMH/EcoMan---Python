@@ -20,25 +20,25 @@ class Node(object):
 class NodeGroup(object):
     def __init__(self, level):
         self.level = level
-        self.nodesLUT = {}
-        self.nodeSymbols = ['+', 'n', 'p', 'P']
-        self.pathSymbols = ['.', '-', '|', 'p', 'P', 'E', 'I']
-        data = self.readMazeFile(level)
-        self.createNodeTable(data)
+        self.nos = {}
+        self.simbolo_nos = ['+', 'n', 'p', 'P']
+        self.simbolo_caminhos = ['.', '-', '|', 'p', 'P', 'E', 'I']
+        data = self.ler_arquivo_libirinto(level)
+        self.criar_nodetable(data)
         self.conectar_horizontal(data)
         self.conectar_vertical(data)
 
-    def readMazeFile(self, textfile):
+    def ler_arquivo_libirinto(self, textfile):
         return np.loadtxt(textfile, dtype='<U1')
     
-    def createNodeTable(self, data, xoffset=0, yoffset=0):
+    def criar_nodetable(self, data, xoffset=0, yoffset=0):
         for row in list(range(data.shape[0])):
             for col in list(range(data.shape[1])):
-                if data[row][col] in self.nodeSymbols:
-                    x, y = self.constructKey(col+xoffset, row+yoffset)
-                    self.nodesLUT[(x, y)] = Node(x, y)
+                if data[row][col] in self.simbolo_nos:
+                    x, y = self.construir(col+xoffset, row+yoffset)
+                    self.nos[(x, y)] = Node(x, y)
     
-    def constructKey(self, x, y):
+    def construir(self, x, y):
         return x * LARGURA_BLOCO, y * ALTURA_BLOCO
     
     # Conectar os nós na horizontal
@@ -46,56 +46,52 @@ class NodeGroup(object):
         for row in list(range(data.shape[0])):
             key = None
             for col in list(range(data.shape[1])):
-                if data[row][col] in self.nodeSymbols:
+                if data[row][col] in self.simbolo_nos:
                     if key is None:
-                        key = self.constructKey(col+xoffset, row+yoffset)
+                        key = self.construir(col+xoffset, row+yoffset)
                     else:
-                        otherkey = self.constructKey(col+xoffset, row+yoffset)
-                        self.nodesLUT[key].vizinhos[DIREITA] = self.nodesLUT[otherkey]
-                        self.nodesLUT[otherkey].vizinhos[ESQUERDA] = self.nodesLUT[key]
+                        otherkey = self.construir(col+xoffset, row+yoffset)
+                        self.nos[key].vizinhos[DIREITA] = self.nos[otherkey]
+                        self.nos[otherkey].vizinhos[ESQUERDA] = self.nos[key]
                         key = otherkey
-                elif data[row][col] not in self.pathSymbols:
+                elif data[row][col] not in self.simbolo_caminhos:
                     key = None
 
     # Conectar os nós na vertical
     def conectar_vertical(self, data, xoffset=0, yoffset=0):
-        dataT = data.transpose()
-        for col in list(range(dataT.shape[0])):
+        data_transposta = data.transpose()
+        for col in list(range(data_transposta.shape[0])):
             key = None
-            for row in list(range(dataT.shape[1])):
-                if dataT[col][row] in self.nodeSymbols:
+            for row in list(range(data_transposta.shape[1])):
+                if data_transposta[col][row] in self.simbolo_nos:
                     if key is None:
-                        key = self.constructKey(col+xoffset, row+yoffset)
+                        key = self.construir(col+xoffset, row+yoffset)
                     else:
-                        otherkey = self.constructKey(col+xoffset, row+yoffset)
-                        self.nodesLUT[key].vizinhos[BAIXO] = self.nodesLUT[otherkey]
-                        self.nodesLUT[otherkey].vizinhos[CIMA] = self.nodesLUT[key]
+                        otherkey = self.construir(col+xoffset, row+yoffset)
+                        self.nos[key].vizinhos[BAIXO] = self.nos[otherkey]
+                        self.nos[otherkey].vizinhos[CIMA] = self.nos[key]
                         key = otherkey
-                elif dataT[col][row] not in self.pathSymbols:
+                elif data_transposta[col][row] not in self.simbolo_caminhos:
                     key = None
 
     # Obter os pixels de um nó
-    def getNodeFromPixels(self, xpixel, ypixel):
-        if (xpixel, ypixel) in self.nodesLUT.keys():
-            return self.nodesLUT[(xpixel, ypixel)]
+    def obter_no_pixel(self, xpixel, ypixel):
+        if (xpixel, ypixel) in self.nos.keys():
+            return self.nos[(xpixel, ypixel)]
         return None
 
     # Obter a linha e coluna de um nó
-    def getNodeFromTiles(self, col, row):
-        x, y = self.constructKey(col, row)
-        if (x, y) in self.nodesLUT.keys():
-            return self.nodesLUT[(x, y)]
+    def obter_no_tiles(self, col, row):
+        x, y = self.construir(col, row)
+        if (x, y) in self.nos.keys():
+            return self.nos[(x, y)]
         return None
     
     # Nó inicial
-    def getStartTempNode(self):
-        nodes = list(self.nodesLUT.values())
-        return nodes[3]
-    
-    def startInimigos(self, valor):
-        nodes = list(self.nodesLUT.values())
-        return nodes[valor]
+    def no_inicial(self, valor):
+        nodes = list(self.nos.values())
+        return nodes[valor] if valor != 0 else nodes[3]
 
     def render(self, screen):
-        for node in self.nodesLUT.values():
+        for node in self.nos.values():
             node.render(screen)

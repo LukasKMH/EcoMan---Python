@@ -1,6 +1,3 @@
-#VERIFICAR AQUI, PAREI AQUI DE BAIXO PARA CIMA
-
-
 import tkinter as tk
 from tkinter import ttk, messagebox
 from ttkbootstrap import Style
@@ -90,7 +87,3 @@ class QuizApp(object):
         self.janela.mainloop()
         if self.acertou != None:
             return self.acertou
-
-if __name__ == "__main__":
-    app = QuizApp()
-    app.iniciar()

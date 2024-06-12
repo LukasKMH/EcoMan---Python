@@ -33,35 +33,31 @@ class LabirintoSprites(Spritesheet):
     def readMazeFile(self, mazefile):
         return np.loadtxt(mazefile, dtype='<U1')
 
-    def constructBackground(self, background, y):
-        for row in range(self.data.shape[0]):
-            for col in range(self.data.shape[1]):
-                if self.data[row][col] == '0':
-                    # Quinas
-                    filepath = os.path.join("assets/Imagens/labirinto", "20_labirinto.png")
-                elif self.data[row][col] == '1':
-                    # Bordas
-                    filepath = os.path.join("assets/Imagens/labirinto", "26_labirinto.png")
-                elif self.data[row][col] == '2':
-                    # Quinas Dentro
-                    filepath = os.path.join("assets/Imagens/labirinto", "26_labirinto.png")
-                elif self.data[row][col] == '3':
-                    # Bordas Dentro
-                    filepath = os.path.join("assets/Imagens/labirinto", "19_labirinto.png")
-                elif self.data[row][col] == '4':
-                    # Preenchido
-                    filepath = os.path.join("assets/Imagens/labirinto", "19_labirinto.png")
-                else:
-                    continue  
-                sprite = pygame.image.load(filepath).convert_alpha()  # Carrega a imagem com transparência
-                sprite = pygame.transform.scale(sprite, (LARGURA_BLOCO, ALTURA_BLOCO))  # Redimensiona a imagem
-                rotval = int(self.rotdata[row][col])
-                sprite = self.rotate(sprite, rotval)
-                background.blit(sprite, (col*LARGURA_BLOCO, row*ALTURA_BLOCO))
+    def construir_fundo(self, fundo):
+        # Mapeia os valores dos blocos aos caminhos dos arquivos de imagem
+        pecas_mapa = {
+            '0': "assets/Imagens/labirinto/20_labirinto.png",
+            '1': "assets/Imagens/labirinto/26_labirinto.png",
+            '2': "assets/Imagens/labirinto/26_labirinto.png",
+            '3': "assets/Imagens/labirinto/19_labirinto.png",
+            '4': "assets/Imagens/labirinto/19_labirinto.png"
+        }
+        
+        for linha in range(self.data.shape[0]):
+            for coluna in range(self.data.shape[1]):
+                valor_celula = self.data[linha][coluna]
+                if valor_celula in pecas_mapa:
+                    filepath = pecas_mapa[valor_celula]
+                    
+                    sprite = pygame.image.load(filepath).convert_alpha()  # Carrega a imagem com transparência
+                    sprite = pygame.transform.scale(sprite, (LARGURA_BLOCO, ALTURA_BLOCO))  # Redimensiona a imagem
+                    rotval = int(self.rotdata[linha][coluna])
+                    sprite = self.rotacionar(sprite, rotval)
+                    fundo.blit(sprite, (coluna * LARGURA_BLOCO, linha * ALTURA_BLOCO))
 
-        return background
+        return fundo
 
-    def rotate(self, sprite, value):
+    def rotacionar(self, sprite, value):
         return pygame.transform.rotate(sprite, value*90)
 
 class EcomanSprites(object):
@@ -123,9 +119,9 @@ class NumeroVidas(object):
         if len(self.images) > 0:
             self.images.pop(0)
 
-    def reset_vidas(self, numlives):
+    def reset_vidas(self, numero_vidas):
         self.images = []
-        for i in range(numlives):
+        for _ in range(numero_vidas):
             self.images.append(self.carregar_imagem())
 
     def carregar_imagem(self):

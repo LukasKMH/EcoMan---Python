@@ -2,7 +2,6 @@ import pygame
 import sys
 from pygame.locals import *
 from scripts.constantes import *
-from scripts.constantes import *
 
 LARGURA_BORDA = 2
 LARGURA_BOTAO = LARGURA_BLOCO * 15
@@ -37,20 +36,20 @@ class TelaFinal:
                 if self.retangulo_mudar_fase.collidepoint(pos_mouse):
                     from scripts.tela_seleção_de_fases import TelaSelecaoFases
                     from scripts.tela_inicial import TelaInicial
-                    tela = TelaInicial()
-                    tela.executar()
-                elif self.retangulo_avancar.collidepoint(pos_mouse):
-                    if self.outcome == "vitoria":
-                        from scripts.labirinto import Labirinto
-                        if self.tela_chamadora.level == 1:  
-                            labirinto = Labirinto("assets/mapas/fase2.txt", "assets/mapas/fase2_rotacao.txt", 2, 4, 90, 2)  
-                        elif self.tela_chamadora.level == 2:
-                            labirinto = Labirinto("assets/mapas/fase3.txt", "assets/mapas/fase3_rotacao.txt", 3, 3, 80, 3)
-                        elif self.tela_chamadora.level == 3:
-                            labirinto = Labirinto("assets/mapas/fase4.txt", "assets/mapas/fase4_rotacao.txt", 4, 3, 70, 3)  
-                        labirinto.iniciar_jogo()
-                    elif self.outcome == "derrota":
-                        self.tela_chamadora.restartGame()
+                    TelaInicial().executar()
+                elif self.retangulo_avancar.collidepoint(pos_mouse) and self.outcome == "vitoria":
+                    from scripts.labirinto import Labirinto
+                    levels = {
+                        1: ("fase2.txt", "fase2_rotacao.txt", 2, 4, 90, 2),
+                        2: ("fase3.txt", "fase3_rotacao.txt", 3, 3, 80, 3),
+                        3: ("fase4.txt", "fase4_rotacao.txt", 4, 3, 70, 3)
+                    }
+                    mapa, rotacao, *params = levels.get(self.tela_chamadora.level, (None,)*6)
+                    if mapa:
+                        Labirinto(f"assets/mapas/{mapa}", f"assets/mapas/{rotacao}", *params).iniciar_jogo()
+                elif self.retangulo_avancar.collidepoint(pos_mouse) and self.outcome == "derrota":
+                    self.tela_chamadora.restartGame()
+
                         
         self.tela.fill(AZUL)
         self.tela.blit(self.imagem, self.imagem_rect)

@@ -31,10 +31,10 @@ class GrupoColetaveis(object):
                 
     def criar_lista_coletaveis(self, pelletfile):
         data = self.ler_arquivo(pelletfile)        
-        for row in range(data.shape[0]):
-            for col in range(data.shape[1]):
-                if data[row][col] in ['P', 'p']:
-                    self.lista_coletaveis.append(Coletavel(row, col))
+        for lihna in range(data.shape[0]):
+            for coluna in range(data.shape[1]):
+                if data[lihna][coluna] in ['P', 'p']:
+                    self.lista_coletaveis.append(Coletavel(lihna, coluna))
                     
     def ler_arquivo(self, textfile):
         return np.loadtxt(textfile, dtype='<U1')

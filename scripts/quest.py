@@ -5,12 +5,12 @@ from scripts.constantes import *
 class Quest(Personagem):
     def __init__(self, node):
         Personagem.__init__(self, node)
-        self.name = QUEST
-        self.color = VERDE
+        self.nome = QUEST
+        self.cor = VERDE
         self.lifespan = 5
         self.timer = 0
         self.destroy = False
-        self.points = 100
+        self.pontuacao = 1000
         self.entre_os_nos(DIREITA)
 
     def update(self, dt):

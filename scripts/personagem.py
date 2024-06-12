@@ -23,11 +23,11 @@ class Personagem(object):
     def definir_posicao(self):
         self.posicao = self.node.posicao.copy()
           
-    def validar_direcao(self, direction):
-        if direction is not PARAR:
-            if self.node.vizinhos[direction] is not None:
-                return True
-        return False
+    def validar_direcao(self, direcao):
+        return direcao != PARAR and self.node.vizinhos[direcao] is not None
+    
+    def direcao_oposta(self, direcao):
+        return direcao != PARAR and direcao == self.direcao * -1
 
     def novo_alvo(self, direction):
         if self.validar_direcao(direction):
@@ -38,9 +38,9 @@ class Personagem(object):
         if self.alvo is not None:
             vec1 = self.alvo.posicao - self.node.posicao
             vec2 = self.posicao - self.node.posicao
-            node2Target = vec1.magnitude_quadrada()
-            node2Self = vec2.magnitude_quadrada()
-            return node2Self >= node2Target
+            node2_alvo = vec1.magnitude_quadrada()
+            node2_self = vec2.magnitude_quadrada()
+            return node2_self >= node2_alvo
         return False
 
     def reverter_direcao(self):
@@ -48,13 +48,7 @@ class Personagem(object):
         temp = self.node
         self.node = self.alvo
         self.alvo = temp
-        
-    def direcao_oposta(self, direction):
-        if direction is not PARAR:
-            if direction == self.direcao * -1:
-                return True
-        return False
-
+    
     def definir_velocidade(self, speed):
         self.speed = speed * LARGURA_BLOCO / 16
 
@@ -74,14 +68,13 @@ class Personagem(object):
             self.definir_posicao()
 
     def validar_direcoes(self):
-        directions = []
-        for key in [CIMA, BAIXO, ESQUERDA, DIREITA]:
-            if self.validar_direcao(key):
-                if key != self.direcao * -1:
-                    directions.append(key)
-        if len(directions) == 0:
-            directions.append(self.direcao * -1)
-        return directions
+        direcoes = [
+            key for key in [CIMA, BAIXO, ESQUERDA, DIREITA]
+            if self.validar_direcao(key) and key != self.direcao * -1
+        ]
+        if not direcoes:
+            direcoes.append(self.direcao * -1)
+        return direcoes
 
     def direcao_aleatoria(self, directions):
         return directions[randint(0, len(directions)-1)]

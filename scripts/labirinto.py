@@ -37,17 +37,16 @@ class Labirinto(object):
         self.gerar_inimigos(numero_inimigos)
         self.lifesprites = NumeroVidas(self.vidas, "assets/Imagens/vida.png")
 
-
     def definir_fundo(self):
         self.background = pygame.surface.Surface(TAMANHO_TELA).convert()
         self.background.fill(AZUL)
 
     def iniciar_jogo(self):
         self.definir_fundo()
-        self.quest = Quest(self.nodes.getStartTempNode())
+        self.quest = Quest(self.nodes.no_inicial(6))
         self.mazesprites = LabirintoSprites(self.mapa, self.mapa_rotacao)
-        self.background = self.mazesprites.constructBackground(self.background, self.level%5)
-        self.ecoman = Ecoman(self.nodes.getStartTempNode())
+        self.background = self.mazesprites.construir_fundo(self.background)
+        self.ecoman = Ecoman(self.nodes.no_inicial(0))
         self.coletaveis = GrupoColetaveis(self.mapa)
         self.textgroup.atualizar_pontuacao(self.score)
         self.textgroup.atualizar_lixo(len(self.coletaveis.lista_coletaveis) - 1)
@@ -84,12 +83,12 @@ class Labirinto(object):
 
     def atualizar_tempo(self):
         if not self.textgroup.atualizar_tempo(self.segundos):
-            resultado = TelaFinal("derrota", self).executar()
+            TelaFinal("derrota", self).executar()
         
     def gerar_inimigos(self, quantidade):
         for _ in range(quantidade):
             i = 22
-            novo_inimigo = Inimigo(self.nodes.startInimigos(i))
+            novo_inimigo = Inimigo(self.nodes.no_inicial(i))
             self.lista_inimigos.append(novo_inimigo)
             i += 1
 
@@ -102,7 +101,7 @@ class Labirinto(object):
                     raio = self.ecoman.raio_colisao
                     self.ecoman.raio_colisao = 0
                     if self.vidas == 0:
-                        resultado = TelaFinal("derrota", self).executar()
+                        TelaFinal("derrota", self).executar()
                     else:
                         self.pause.pausar(tempo_pausa=0.5)  
                 inimigo.definir_velocidade(10)
@@ -114,9 +113,9 @@ class Labirinto(object):
     
     def verificar_evento_quest(self):
         if self.quest is not None and self.ecoman.collideCheck(self.quest):
-            self.quest = None  # Faz o quest sumir da tela
-            nova_tela = QuizApp()  # Cria uma nova instância da tela desejada com a janela principal
-            acertou = nova_tela.iniciar()  # Armazena o resultado retornado pelo método iniciar
+            self.quest = None  
+            nova_tela = QuizApp() 
+            acertou = nova_tela.iniciar()  
             if acertou:
                 self.atualizar_pontuacao(1000)
             
@@ -124,14 +123,13 @@ class Labirinto(object):
         for event in pygame.event.get():
             if event.type == QUIT:
                 exit()
-            elif event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    if self.ecoman.vivo:
-                        self.pause.pausar()
-                    if not self.pause.pausado:
-                        self.textgroup.esconder_texto()
-                    else:
-                        self.textgroup.mostrar_texto(PAUSETXT)
+            if event.type == KEYDOWN and event.key == K_ESCAPE:
+                if self.ecoman.vivo:
+                    self.pause.pausar()
+                if self.pause.pausado:
+                    self.textgroup.mostrar_texto(PAUSETXT)
+                else:
+                    self.textgroup.esconder_texto()
 
     def verificar_evento_coletavel(self):
         coletaveis = self.ecoman.coletar(self.coletaveis.lista_coletaveis)
@@ -145,10 +143,7 @@ class Labirinto(object):
                 self.proximo_level()
 
     def proximo_level(self):
-        if self.level != 4:
-            TelaFinal("vitoria", self).executar()
-        else:
-            TelaFinal("fim", self).executar()
+        TelaFinal("vitoria" if self.level != 4 else "fim", self).executar()
 
     def restart_game(self):
         self.vidas = self.vidas2
